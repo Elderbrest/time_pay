@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "369643963321",
+    "project_id": "time-and-work-78615",
+    "storage_bucket": "time-and-work-78615.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369643963321:android:2a829193ed685811b92c68",
+        "android_client_info": {
+          "package_name": "com.example.timepay"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPMxYvM3bmtjWrWQQPHvvjsVwgQry7Dpk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

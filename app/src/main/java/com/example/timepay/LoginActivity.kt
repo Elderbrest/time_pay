@@ -9,14 +9,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.timepay.databinding.ActivityLoginBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        auth = Firebase.auth
 
         // Style the Sign Up text
         val fullText = "Don't have an account? Sign Up"
@@ -24,7 +30,6 @@ class LoginActivity : AppCompatActivity() {
         val signUpStart = fullText.indexOf("Sign Up")
         val signUpEnd = signUpStart + "Sign Up".length
         
-        // Apply purple color to "Sign Up"
         val purpleColor = ContextCompat.getColor(this, R.color.purple_500)
         spannableString.setSpan(
             ForegroundColorSpan(purpleColor),
@@ -44,10 +49,15 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // TODO: Implement actual login logic here
-            // For now, we'll just proceed to MainActivity
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
+                    } else {
+                        Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
         }
     }
 } 
