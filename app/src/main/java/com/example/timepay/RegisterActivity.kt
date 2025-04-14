@@ -5,11 +5,15 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.timepay.databinding.ActivityRegisterBinding
+import com.example.timepay.models.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var auth: FirebaseAuth
+    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,11 +38,46 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            // Split full name into first and last name
+            val nameParts = fullName.split(" ", limit = 2)
+            val firstName = nameParts[0]
+            val lastName = if (nameParts.size > 1) nameParts[1] else ""
+
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener {
-                    Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
+                    // Set display name in Firebase Auth
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(fullName)
+                        .build()
+
+                    auth.currentUser?.updateProfile(profileUpdates)
+                        ?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                // Save additional user data to Firestore
+                                val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
+                                val user = User(
+                                    firstname = firstName,
+                                    lastname = lastName,
+                                    email = email,
+                                    company = "",  // Can be updated later
+                                    photoURL = ""  // Will be updated when user uploads photo
+                                )
+
+                                db.collection("users")
+                                    .document(userId)
+                                    .set(user)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
+                                        startActivity(Intent(this, MainActivity::class.java))
+                                        finish()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Toast.makeText(this, "Failed to save user data: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    }
+                            } else {
+                                Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Registration failed: ${e.message}", Toast.LENGTH_SHORT).show()
