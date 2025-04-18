@@ -2,6 +2,7 @@ package com.example.timepay
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.timepay.databinding.ActivityRegisterBinding
@@ -17,6 +18,7 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
