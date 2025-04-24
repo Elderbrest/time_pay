@@ -5,12 +5,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.example.timepay.LoginActivity
 import com.example.timepay.databinding.FragmentHomeBinding
 import com.example.timepay.models.User
 import com.google.firebase.auth.FirebaseAuth
@@ -48,6 +51,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        Log.d("HomeFragment", "onViewCreated: Loading user data")
         loadUserData()
         
         // Set click listener for profile image
@@ -57,16 +61,24 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadUserData() {
-        val userId = auth.currentUser?.uid ?: return
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            Log.e("HomeFragment", "loadUserData: No user ID found")
+            return
+        }
+        
+        Log.d("HomeFragment", "loadUserData: Fetching data for user $userId")
         
         db.collection("users").document(userId)
             .get()
             .addOnSuccessListener { document ->
-                if (document != null) {
+                if (document != null && document.exists()) {
+                    Log.d("HomeFragment", "loadUserData: Document exists with data: ${document.data}")
                     val user = document.toObject(User::class.java)
                     user?.let {
                         // Set full name
                         val fullName = "${it.firstname} ${it.lastname}".trim()
+                        Log.d("HomeFragment", "loadUserData: Setting full name to $fullName (firstname: ${it.firstname}, lastname: ${it.lastname})")
                         binding.fullNameText.text = fullName
                         
                         // Set company name
@@ -76,10 +88,15 @@ class HomeFragment : Fragment() {
                         if (it.photoURL.isNotEmpty()) {
                             updateProfileImage(Uri.parse(it.photoURL))
                         }
+                    } ?: run {
+                        Log.e("HomeFragment", "loadUserData: Failed to convert document to User object")
                     }
+                } else {
+                    Log.e("HomeFragment", "loadUserData: No document found for user $userId")
                 }
             }
             .addOnFailureListener { e ->
+                Log.e("HomeFragment", "loadUserData: Error loading user data", e)
                 Toast.makeText(context, "Error loading user data: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
@@ -131,6 +148,24 @@ class HomeFragment : Fragment() {
                 .circleCrop()
                 .into(binding.profileImage)
         }
+    }
+
+    private fun showSettingsDialog() {
+        val options = arrayOf("Logout")
+        AlertDialog.Builder(requireContext())
+            .setTitle("Settings")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> logout()
+                }
+            }
+            .show()
+    }
+
+    private fun logout() {
+        auth.signOut()
+        startActivity(Intent(requireContext(), LoginActivity::class.java))
+        requireActivity().finish()
     }
 
     override fun onDestroyView() {
