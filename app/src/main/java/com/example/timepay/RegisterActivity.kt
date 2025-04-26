@@ -5,16 +5,18 @@ import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.timepay.databinding.ActivityRegisterBinding
 import com.example.timepay.models.User
+import com.example.timepay.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var auth: FirebaseAuth
-    private val db = FirebaseFirestore.getInstance()
+    private val userRepository = UserRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,26 +58,23 @@ class RegisterActivity : AppCompatActivity() {
                         ?.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 // Save additional user data to Firestore
-                                val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
-                                val user = User(
-                                    firstname = firstName,
-                                    lastname = lastName,
-                                    email = email,
-                                    company = "",  // Can be updated later
-                                    photoURL = ""  // Will be updated when user uploads photo
-                                )
-
-                                db.collection("users")
-                                    .document(userId)
-                                    .set(user)
-                                    .addOnSuccessListener {
-                                        Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
-                                        startActivity(Intent(this, MainActivity::class.java))
+                                lifecycleScope.launch {
+                                    try {
+                                        val user = User(
+                                            firstname = firstName,
+                                            lastname = lastName,
+                                            email = email,
+                                            company = "",  // Can be updated later
+                                            photoURL = ""  // Will be updated when user uploads photo
+                                        )
+                                        userRepository.createUserProfile(user)
+                                        Toast.makeText(this@RegisterActivity, "Registration successful!", Toast.LENGTH_SHORT).show()
+                                        startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
                                         finish()
+                                    } catch (e: Exception) {
+                                        Toast.makeText(this@RegisterActivity, "Failed to save user data: ${e.message}", Toast.LENGTH_SHORT).show()
                                     }
-                                    .addOnFailureListener { e ->
-                                        Toast.makeText(this, "Failed to save user data: ${e.message}", Toast.LENGTH_SHORT).show()
-                                    }
+                                }
                             } else {
                                 Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show()
                             }

@@ -13,13 +13,17 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.timepay.LoginActivity
 import com.example.timepay.databinding.FragmentHomeBinding
 import com.example.timepay.models.User
+import com.example.timepay.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -28,6 +32,7 @@ class HomeFragment : Fragment() {
     private val storage = FirebaseStorage.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
+    private val userRepository = UserRepository()
 
     private val imagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -61,44 +66,24 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadUserData() {
-        val userId = auth.currentUser?.uid
-        if (userId == null) {
-            Log.e("HomeFragment", "loadUserData: No user ID found")
-            return
-        }
-        
-        Log.d("HomeFragment", "loadUserData: Fetching data for user $userId")
-        
-        db.collection("users").document(userId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    Log.d("HomeFragment", "loadUserData: Document exists with data: ${document.data}")
-                    val user = document.toObject(User::class.java)
-                    user?.let {
-                        // Set full name
-                        val fullName = "${it.firstname} ${it.lastname}".trim()
-                        Log.d("HomeFragment", "loadUserData: Setting full name to $fullName (firstname: ${it.firstname}, lastname: ${it.lastname})")
-                        binding.fullNameText.text = fullName
-                        
-                        // Set company name
-                        binding.workplaceText.text = it.company.ifEmpty { "Add your workplace" }
-                        
-                        // Load profile image if URL exists
-                        if (it.photoURL.isNotEmpty()) {
-                            updateProfileImage(Uri.parse(it.photoURL))
-                        }
-                    } ?: run {
-                        Log.e("HomeFragment", "loadUserData: Failed to convert document to User object")
+        viewLifecycleOwner.lifecycleScope.launch {
+            userRepository.getCurrentUser().collectLatest { user ->
+                user?.let {
+                    // Set full name
+                    val fullName = "${it.firstname} ${it.lastname}".trim()
+                    Log.d("HomeFragment", "loadUserData: Setting full name to $fullName (firstname: ${it.firstname}, lastname: ${it.lastname})")
+                    binding.fullNameText.text = fullName
+                    
+                    // Set company name
+                    binding.workplaceText.text = it.company.ifEmpty { "Add your workplace" }
+                    
+                    // Load profile image if URL exists
+                    if (it.photoURL.isNotEmpty()) {
+                        updateProfileImage(Uri.parse(it.photoURL))
                     }
-                } else {
-                    Log.e("HomeFragment", "loadUserData: No document found for user $userId")
                 }
             }
-            .addOnFailureListener { e ->
-                Log.e("HomeFragment", "loadUserData: Error loading user data", e)
-                Toast.makeText(context, "Error loading user data: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        }
     }
 
     private fun openImagePicker() {
@@ -117,12 +102,15 @@ class HomeFragment : Fragment() {
                 // Get the download URL and update the UI
                 storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                     // Update Firestore with the new photo URL
-                    db.collection("users").document(userId)
-                        .update("photoURL", downloadUri.toString())
-                        .addOnSuccessListener {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        try {
+                            userRepository.updateUser(User(photoURL = downloadUri.toString()))
                             updateProfileImage(downloadUri)
                             Toast.makeText(context, "Profile image updated!", Toast.LENGTH_SHORT).show()
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Failed to update profile: ${e.message}", Toast.LENGTH_SHORT).show()
                         }
+                    }
                 }
             }
             .addOnFailureListener { e ->
