@@ -6,7 +6,6 @@ data class User(
     val lastname: String = "",
     val email: String = "",
     val company: String = "",
-    val photoURL: String = "",
     val role: String = "user",  // For role-based access
     val createdAt: Long = System.currentTimeMillis(),
     val lastLogin: Long = System.currentTimeMillis(),
