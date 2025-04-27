@@ -64,8 +64,7 @@ class RegisterActivity : AppCompatActivity() {
                                             firstname = firstName,
                                             lastname = lastName,
                                             email = email,
-                                            company = "",  // Can be updated later
-                                            photoURL = ""  // Will be updated when user uploads photo
+                                            company = ""  // Can be updated later
                                         )
                                         userRepository.createUserProfile(user)
                                         Toast.makeText(this@RegisterActivity, "Registration successful!", Toast.LENGTH_SHORT).show()
