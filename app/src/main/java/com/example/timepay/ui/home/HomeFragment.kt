@@ -69,19 +69,32 @@ class HomeFragment : Fragment() {
     private fun loadUserData() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
+                Log.d("HomeFragment", "Fetching user data...")
                 val user = userRepository.getCurrentUserOnce()
-                user?.let {
+                
+                if (user != null) {
+                    Log.d("HomeFragment", "User data retrieved: $user")
+                    Log.d("HomeFragment", "First name: '${user.firstName}', Last name: '${user.lastName}'")
+                    
                     // Set full name
-                    val fullName = "${it.firstname} ${it.lastname}".trim()
-                    binding.fullNameText.text = fullName
+                    val fullName = "${user.firstName} ${user.lastName}".trim()
+                    Log.d("HomeFragment", "Full name constructed: '$fullName'")
+                    
+                    binding.fullNameText.text = if (fullName.isNotBlank()) fullName else "User"
+                    Log.d("HomeFragment", "Text set to fullNameText: '${binding.fullNameText.text}'")
                     
                     // Set company name
-                    binding.workplaceText.text = it.company.ifEmpty { "Add your workplace" }
+                    binding.workplaceText.text = user.company.ifEmpty { "Add your workplace" }
                     
                     // Always try to load from storage
                     loadProfileImageForCurrentUser()
+                } else {
+                    Log.w("HomeFragment", "No user data available")
+                    binding.fullNameText.text = "User"
+                    binding.workplaceText.text = "Add your workplace"
                 }
             } catch (e: Exception) {
+                Log.e("HomeFragment", "Error loading user data", e)
                 Toast.makeText(context, "Error loading user data: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -153,41 +166,28 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 val user = userRepository.getCurrentUserOnce()
                 user?.let {
-                    showInitialsPlaceholder(it.firstname)
+                    showInitialsPlaceholder(it.firstName)
                 }
             }
         }
     }
 
     private fun showInitialsPlaceholder(firstname: String) {
-        val initials = if (firstname.isNotEmpty()) {
-            firstname.first().toString()
+        // Get initials from first letter of first name
+        val initial = if (firstname.isNotEmpty()) {
+            firstname.first().toString().uppercase()
         } else {
             "?"
         }
 
-        // Create a circular background with user's initials
+        Log.d("HomeFragment", "Showing initial: $initial")
+        
+        // Show the initials in the TextView
+        binding.profileInitial.text = initial
+        binding.profileInitial.visibility = View.VISIBLE
+        
+        // Hide the image view background if needed
         binding.profileImage.setImageResource(R.drawable.circle_background)
-        binding.profileImage.setBackgroundResource(R.drawable.circle_background)
-        binding.profileImage.setImageDrawable(null)
-        
-        // Add a TextView for initials
-        val textView = TextView(context).apply {
-            text = initials
-            textSize = 48f
-            setTextColor(Color.parseColor("#757575")) // Google's grey color
-            gravity = Gravity.CENTER
-            typeface = Typeface.DEFAULT_BOLD
-        }
-        
-        // Remove any existing TextView
-        (binding.profileImage.parent as? ViewGroup)?.removeView(textView)
-        
-        // Add the TextView
-        (binding.profileImage.parent as? ViewGroup)?.addView(textView, ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        ))
     }
 
     override fun onDestroyView() {

@@ -61,8 +61,8 @@ class RegisterActivity : AppCompatActivity() {
                                 lifecycleScope.launch {
                                     try {
                                         val user = User(
-                                            firstname = firstName,
-                                            lastname = lastName,
+                                            firstName = firstName,
+                                            lastName = lastName,
                                             email = email,
                                             company = ""  // Can be updated later
                                         )
