@@ -74,24 +74,45 @@ class HomeFragment : Fragment() {
                 
                 if (user != null) {
                     Log.d("HomeFragment", "User data retrieved: $user")
-                    Log.d("HomeFragment", "First name: '${user.firstName}', Last name: '${user.lastName}'")
                     
                     // Set full name
                     val fullName = "${user.firstName} ${user.lastName}".trim()
-                    Log.d("HomeFragment", "Full name constructed: '$fullName'")
-                    
                     binding.fullNameText.text = if (fullName.isNotBlank()) fullName else "User"
-                    Log.d("HomeFragment", "Text set to fullNameText: '${binding.fullNameText.text}'")
                     
                     // Set company name
                     binding.workplaceText.text = user.company.ifEmpty { "Add your workplace" }
+
+                    // Format and display salary rate
+                    val rate = if (user.salaryRate % 1 == 0.0) {
+                        user.salaryRate.toInt().toString()
+                    } else {
+                        String.format("%.2f", user.salaryRate)
+                    }
+                    binding.salaryRateText.text = "${user.currency} $rate/h"
+
+                    // Weekly stats
+                    binding.hoursThisWeekText.text = "0h"
+                    binding.earningsThisWeekText.text = "${user.currency} 0"
+
+                    // Monthly stats
+                    binding.monthlyHoursText.text = "0h"
+                    binding.monthlyEarningsText.text = "${user.currency} 0"
+                    binding.daysWorkedText.text = "0"
                     
-                    // Always try to load from storage
+                    // Load profile image
                     loadProfileImageForCurrentUser()
                 } else {
                     Log.w("HomeFragment", "No user data available")
                     binding.fullNameText.text = "User"
                     binding.workplaceText.text = "Add your workplace"
+                    binding.salaryRateText.text = "Set your rate"
+                    
+                    // Reset stats
+                    binding.hoursThisWeekText.text = "0h"
+                    binding.earningsThisWeekText.text = "$0"
+                    binding.monthlyHoursText.text = "0h"
+                    binding.monthlyEarningsText.text = "$0"
+                    binding.daysWorkedText.text = "0"
                 }
             } catch (e: Exception) {
                 Log.e("HomeFragment", "Error loading user data", e)
