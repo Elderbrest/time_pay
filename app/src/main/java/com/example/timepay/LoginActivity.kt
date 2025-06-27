@@ -2,13 +2,9 @@ package com.example.timepay
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.example.timepay.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -47,7 +43,6 @@ class LoginActivity : AppCompatActivity() {
 
         // Set click listener for sign up text
         binding.signUpText.setOnClickListener { view ->
-            Log.d("LoginActivity", "Sign Up text clicked")
             try {
                 val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                 startActivity(intent)
