@@ -25,22 +25,6 @@ class LoginActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
-        // Style the Sign Up text
-        val fullText = "Don't have an account? Sign Up"
-        val spannableString = SpannableString(fullText)
-        val signUpStart = fullText.indexOf("Sign Up")
-        val signUpEnd = signUpStart + "Sign Up".length
-        
-        val purpleColor = ContextCompat.getColor(this, R.color.purple_500)
-        spannableString.setSpan(
-            ForegroundColorSpan(purpleColor),
-            signUpStart,
-            signUpEnd,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        
-        binding.signUpText.text = spannableString
-
         binding.loginButton.setOnClickListener {
             val email = binding.emailInput.text.toString()
             val password = binding.passwordInput.text.toString()
