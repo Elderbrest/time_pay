@@ -141,10 +141,7 @@ class SettingsFragment : Fragment() {
                 try {
                     // Create a map of fields to update in a single operation
                     val updates = mapOf(
-                        "firstname" to firstName,
-                        "lastname" to lastName,
-                        // Add both versions of field names to ensure compatibility
-                        "firstName" to firstName, 
+                        "firstName" to firstName,
                         "lastName" to lastName,
                         "company" to company,
                         "salaryRate" to salaryRate,

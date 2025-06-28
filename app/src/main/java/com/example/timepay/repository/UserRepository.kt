@@ -39,45 +39,29 @@ class UserRepository {
 
     suspend fun createUserProfile(user: User) {
         val userId = auth.currentUser?.uid ?: return
-        
-        // First check if user document already exists
+
         val document = db.collection("users")
             .document(userId)
             .get()
             .await()
 
         if (document.exists()) {
-            // User already exists, update instead
-            updateUser(user)
+            val updates = mutableMapOf<String, Any>()
+
+            if (user.firstName.isNotEmpty()) updates["firstName"] = user.firstName
+            if (user.lastName.isNotEmpty()) updates["lastName"] = user.lastName
+            if (user.email.isNotEmpty()) updates["email"] = user.email
+            if (user.company.isNotEmpty()) updates["company"] = user.company
+            if (user.role.isNotEmpty()) updates["role"] = user.role
+            if (user.createdAt > 0) updates["createdAt"] = user.createdAt
+            if (user.lastLogin > 0) updates["lastLogin"] = user.lastLogin
+            if (user.settings != UserSettings()) updates["settings"] = user.settings
+
+            updateUserFields(updates)
         } else {
-            // Create new user document
             db.collection("users")
                 .document(userId)
                 .set(user.copy(id = userId))
-                .await()
-        }
-    }
-
-    suspend fun updateUser(user: User) {
-        val userId = auth.currentUser?.uid ?: return
-        
-        // Create a map of non-empty fields to update
-        val updates = mutableMapOf<String, Any>()
-        
-        if (user.firstName.isNotEmpty()) updates["firstname"] = user.firstName
-        if (user.lastName.isNotEmpty()) updates["lastname"] = user.lastName
-        if (user.email.isNotEmpty()) updates["email"] = user.email
-        if (user.company.isNotEmpty()) updates["company"] = user.company
-        if (user.role.isNotEmpty()) updates["role"] = user.role
-        if (user.createdAt > 0) updates["createdAt"] = user.createdAt
-        if (user.lastLogin > 0) updates["lastLogin"] = user.lastLogin
-        if (user.settings != UserSettings()) updates["settings"] = user.settings
-
-        // Only update if there are fields to update
-        if (updates.isNotEmpty()) {
-            db.collection("users")
-                .document(userId)
-                .update(updates)
                 .await()
         }
     }
@@ -98,42 +82,5 @@ class UserRepository {
         } else {
             android.util.Log.w("UserRepository", "No fields to update")
         }
-    }
-
-    suspend fun updateCompanyField(company: String?) {
-        val userId = auth.currentUser?.uid ?: return
-        db.collection("users")
-            .document(userId)
-            .update("company", company ?: "")
-            .await()
-    }
-
-    suspend fun updateUserSettings(settings: UserSettings) {
-        val userId = auth.currentUser?.uid ?: return
-        db.collection("users")
-            .document(userId)
-            .update("settings", settings)
-            .await()
-    }
-
-    suspend fun updateLastLogin() {
-        val userId = auth.currentUser?.uid ?: return
-        db.collection("users")
-            .document(userId)
-            .update("lastLogin", System.currentTimeMillis())
-            .await()
-    }
-
-    suspend fun updateSalaryRateAndCurrency(salaryRate: Double, currency: String) {
-        val userId = auth.currentUser?.uid ?: return
-        val updates = mapOf(
-            "salaryRate" to salaryRate,
-            "currency" to currency
-        )
-        
-        db.collection("users")
-            .document(userId)
-            .update(updates)
-            .await()
     }
 } 
