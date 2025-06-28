@@ -86,15 +86,15 @@ class HomeFragment : Fragment() {
 
         // Salary rate
         val formattedRate = "%.2f".format(user.salaryRate)
-        binding.salaryRateText.text = getString(R.string.salary_rate, user.currency, formattedRate)
+        binding.salaryRateText.text = getString(R.string.salary_rate, getString(R.string.currency_code), formattedRate)
 
         // Weekly stats
         binding.hoursThisWeekText.text = "0h"
-        binding.earningsThisWeekText.text = "${user.currency} 0"
+        binding.earningsThisWeekText.text = "${getString(R.string.currency_code)} 0"
 
         // Monthly stats
         binding.monthlyHoursText.text = "0h"
-        binding.monthlyEarningsText.text = "${user.currency} 0"
+        binding.monthlyEarningsText.text = "${getString(R.string.currency_code)} 0"
         binding.daysWorkedText.text = "0"
 
         // Profile photo

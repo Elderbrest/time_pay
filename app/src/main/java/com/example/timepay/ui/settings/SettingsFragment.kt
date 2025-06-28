@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -26,9 +24,6 @@ class SettingsFragment : Fragment() {
     private val binding get() = _binding!!
     private val auth = FirebaseAuth.getInstance()
     private val userRepository = UserRepository()
-    
-    // Common currencies
-    private val currencies = listOf("USD", "EUR", "GBP", "JPY", "CAD", "AUD", "CNY", "RUB")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,9 +38,6 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         try {
-            // Setup currency dropdown
-            setupCurrencyDropdown()
-            
             // Load current user data
             loadUserData()
     
@@ -61,16 +53,6 @@ class SettingsFragment : Fragment() {
             android.util.Log.e("SettingsFragment", "Error setting up fragment", e)
             Toast.makeText(context, "Error setting up settings: ${e.message}", Toast.LENGTH_SHORT).show()
             resetUI()
-        }
-    }
-    
-    private fun setupCurrencyDropdown() {
-        try {
-            val currencyDropdown = binding.currencyDropdown as AutoCompleteTextView
-            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, currencies)
-            currencyDropdown.setAdapter(adapter)
-        } catch (e: Exception) {
-            android.util.Log.e("SettingsFragment", "Error setting up currency dropdown", e)
         }
     }
     
@@ -94,16 +76,8 @@ class SettingsFragment : Fragment() {
                     
                     // Load salary rate
                     if (user.salaryRate > 0) {
-                        binding.salaryRateInput.setText(user.salaryRate.toString())
-                    } else {
+                        binding.salaryRateInput.setText("%.2f".format(user.salaryRate))                    } else {
                         binding.salaryRateInput.setText("")
-                    }
-                    
-                    // Load currency
-                    if (user.currency.isNotEmpty()) {
-                        binding.currencyDropdown.setText(user.currency, false)
-                    } else {
-                        binding.currencyDropdown.setText("USD", false)
                     }
                     
                     android.util.Log.d("SettingsFragment", "Successfully loaded user data")
@@ -129,7 +103,6 @@ class SettingsFragment : Fragment() {
         binding.lastNameInput.isEnabled = !isLoading
         binding.companyInput.isEnabled = !isLoading
         binding.salaryRateInput.isEnabled = !isLoading
-        binding.currencyDropdown.isEnabled = !isLoading
         binding.saveSettingsButton.isEnabled = !isLoading
         binding.saveSettingsButton.text = if (isLoading) "Loading..." else "Save"
     }
@@ -145,8 +118,7 @@ class SettingsFragment : Fragment() {
             val lastName = binding.lastNameInput.text.toString().trim()
             val company = binding.companyInput.text.toString().trim()
             val salaryRateText = binding.salaryRateInput.text.toString().trim()
-            val currency = binding.currencyDropdown.text.toString().trim()
-            
+
             android.util.Log.d("SettingsFragment", "Preparing to save: firstName=$firstName, lastName=$lastName, company=$company")
             
             // Simple validation for salary rate
@@ -176,7 +148,6 @@ class SettingsFragment : Fragment() {
                         "lastName" to lastName,
                         "company" to company,
                         "salaryRate" to salaryRate,
-                        "currency" to currency
                     )
                     
                     android.util.Log.d("SettingsFragment", "Updating user fields: $updates")

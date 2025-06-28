@@ -8,7 +8,6 @@ data class User(
     val company: String = "",
     val role: String = "user",  // For role-based access
     val salaryRate: Double = 0.0,
-    val currency: String = "USD",
     val createdAt: Long = System.currentTimeMillis(),
     val lastLogin: Long = System.currentTimeMillis(),
     val settings: UserSettings = UserSettings()

@@ -19,6 +19,9 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.emailInput.setText("elderblr2@gmail.com")
+        binding.passwordInput.setText("7218788")
+
         auth = Firebase.auth
 
         binding.loginButton.setOnClickListener {
