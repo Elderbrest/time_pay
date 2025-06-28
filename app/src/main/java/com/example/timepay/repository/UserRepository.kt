@@ -19,19 +19,9 @@ class UserRepository {
                 .document(userId)
                 .get(com.google.firebase.firestore.Source.SERVER)
                 .await()
-            
-            android.util.Log.d("UserRepository", "Fetched document from server: ${document.id}")
-            android.util.Log.d("UserRepository", "Document data: ${document.data}")
-            
-            // Check specific fields
-            android.util.Log.d("UserRepository", "firstname field: ${document.getString("firstname")}")
-            android.util.Log.d("UserRepository", "lastName field: ${document.getString("lastName")}")
-            android.util.Log.d("UserRepository", "lastname field: ${document.getString("lastname")}")
-            android.util.Log.d("UserRepository", "firstName field: ${document.getString("firstName")}")
-            
+
             document.toObject(User::class.java)
         } catch (e: Exception) {
-            android.util.Log.e("UserRepository", "Failed to fetch from server, trying cache", e)
             try {
                 // Fallback to cache if server fetch fails
                 val document = db.collection("users")
@@ -44,23 +34,6 @@ class UserRepository {
                 android.util.Log.e("UserRepository", "Failed to fetch user data", e)
                 null
             }
-        }
-    }
-
-    // New method: Get user directly from server with no cache fallback
-    suspend fun getCurrentUserStrict(): User? {
-        val userId = auth.currentUser?.uid ?: return null
-        return try {
-            // Force server fetch only, no cache fallback
-            val document = db.collection("users")
-                .document(userId)
-                .get(com.google.firebase.firestore.Source.SERVER)
-                .await()
-            
-            document.toObject(User::class.java)
-        } catch (e: Exception) {
-            android.util.Log.e("UserRepository", "Failed to fetch from server (strict mode)", e)
-            null
         }
     }
 
