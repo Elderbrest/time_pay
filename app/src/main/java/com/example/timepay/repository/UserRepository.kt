@@ -1,10 +1,8 @@
 package com.example.timepay.repository
 
 import com.example.timepay.models.User
-import com.example.timepay.models.UserSettings
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.tasks.await
 
 class UserRepository {
@@ -55,7 +53,6 @@ class UserRepository {
             if (user.role.isNotEmpty()) updates["role"] = user.role
             if (user.createdAt > 0) updates["createdAt"] = user.createdAt
             if (user.lastLogin > 0) updates["lastLogin"] = user.lastLogin
-            if (user.settings != UserSettings()) updates["settings"] = user.settings
 
             updateUserFields(updates)
         } else {

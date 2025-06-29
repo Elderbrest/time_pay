@@ -10,11 +10,4 @@ data class User(
     val salaryRate: Double = 0.0,
     val createdAt: Long = System.currentTimeMillis(),
     val lastLogin: Long = System.currentTimeMillis(),
-    val settings: UserSettings = UserSettings()
 )
-
-data class UserSettings(
-    val theme: String = "light",
-    val notifications: Boolean = true,
-    val language: String = "en"
-) 

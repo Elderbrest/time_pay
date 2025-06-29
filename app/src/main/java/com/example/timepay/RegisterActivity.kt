@@ -2,7 +2,6 @@ package com.example.timepay
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -20,7 +19,6 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -64,7 +62,6 @@ class RegisterActivity : AppCompatActivity() {
                                             firstName = firstName,
                                             lastName = lastName,
                                             email = email,
-                                            company = ""  // Can be updated later
                                         )
                                         userRepository.createUserProfile(user)
                                         Toast.makeText(this@RegisterActivity, "Registration successful!", Toast.LENGTH_SHORT).show()
