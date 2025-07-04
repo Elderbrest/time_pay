@@ -1,29 +1,42 @@
 package com.example.timepay.ui.dashboard
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.example.timepay.databinding.FragmentCalendarBinding
+import com.example.timepay.R
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.view.CalendarView
+import com.kizitonwose.calendar.view.MonthDayBinder
+import com.kizitonwose.calendar.view.ViewContainer
+import java.time.DayOfWeek
+import java.time.YearMonth
 
-class CalendarFragment : Fragment() {
+class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
-    private var _binding: FragmentCalendarBinding? = null
-    private val binding get() = _binding!!
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentCalendarBinding.inflate(inflater, container, false)
+        val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
+        val currentMonth = YearMonth.now()
 
-        return binding.root
-    }
+        calendarView.setup(
+            startMonth = currentMonth.minusMonths(10),
+            endMonth = currentMonth.plusMonths(10),
+            firstDayOfWeek = DayOfWeek.MONDAY
+        )
+        calendarView.scrollToMonth(currentMonth)
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        class DayViewContainer(view: View) : ViewContainer(view) {
+            val textView: TextView = view.findViewById(R.id.calendarDayText)
+        }
+
+        calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
+            override fun create(view: View) = DayViewContainer(view)
+
+            override fun bind(container: DayViewContainer, day: CalendarDay) {
+                container.textView.text = day.date.dayOfMonth.toString()
+            }
+        }
     }
 }
