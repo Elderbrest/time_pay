@@ -18,6 +18,7 @@ import java.time.LocalDate
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     private var currentMonth = YearMonth.now()
+    private var selectedDate: LocalDate? = null
 
     private fun updateMonthText(monthText: TextView, month: YearMonth) {
         val context = monthText.context
@@ -44,7 +45,17 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         updateMonthText(monthTitle, currentMonth)
 
         class DayViewContainer(view: View) : ViewContainer(view) {
+            lateinit var day: CalendarDay
             val textView: TextView = view.findViewById(R.id.calendarDayText)
+
+            init {
+                view.setOnClickListener {
+                    if (day.position == DayPosition.MonthDate) {
+                        selectedDate = day.date
+                        calendarView.notifyCalendarChanged()
+                    }
+                }
+            }
         }
 
         calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
@@ -52,17 +63,25 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
             override fun bind(container: DayViewContainer, day: CalendarDay) {
                 container.textView.text = day.date.dayOfMonth.toString()
+                container.day = day
 
                 when {
+                    day.date == selectedDate -> {
+                        container.textView.setTextColor(resources.getColor(R.color.black, null))
+                        container.textView.setBackgroundResource(R.drawable.bg_selected_day)
+                    }
                     day.date == LocalDate.now() -> {
                         container.textView.setTextColor(resources.getColor(R.color.black, null))
                         container.textView.setTypeface(null, android.graphics.Typeface.BOLD)
+                        container.textView.background = null
                     }
                     day.position == DayPosition.MonthDate -> {
                         container.textView.setTextColor(resources.getColor(R.color.calendar_day_active, null))
+                        container.textView.background = null
                     }
                     else -> {
                         container.textView.setTextColor(resources.getColor(R.color.calendar_day_inactive, null))
+                        container.textView.background = null
                     }
                 }
             }
