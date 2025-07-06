@@ -35,6 +35,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         val nextButton = view.findViewById<ImageView>(R.id.nextMonthButton)
         val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
         val monthTitle = view.findViewById<TextView>(R.id.monthText)
+        val notesText = view.findViewById<TextView>(R.id.notesText)
 
         calendarView.setup(
             startMonth = currentMonth.minusMonths(10),
@@ -53,6 +54,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                     if (day.position == DayPosition.MonthDate) {
                         selectedDate = day.date
                         calendarView.notifyCalendarChanged()
+                        notesText.visibility = View.VISIBLE
+                        notesText.text = "Заметки для ${day.date}"
                     }
                 }
             }
