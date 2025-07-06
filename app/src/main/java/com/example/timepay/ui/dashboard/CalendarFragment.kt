@@ -10,6 +10,7 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.view.CalendarView
 import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.ViewContainer
+import com.kizitonwose.calendar.core.DayPosition
 import java.time.DayOfWeek
 import java.time.YearMonth
 
@@ -50,6 +51,11 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
             override fun bind(container: DayViewContainer, day: CalendarDay) {
                 container.textView.text = day.date.dayOfMonth.toString()
+                if (day.position == DayPosition.MonthDate) {
+                    container.textView.setTextColor(resources.getColor(R.color.calendar_day_active, null))
+                } else {
+                    container.textView.setTextColor(resources.getColor(R.color.calendar_day_inactive, null))
+                }
             }
         }
 
