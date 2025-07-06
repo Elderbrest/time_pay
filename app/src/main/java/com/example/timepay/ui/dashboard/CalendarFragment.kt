@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.timepay.R
 import com.kizitonwose.calendar.core.CalendarDay
@@ -36,6 +37,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
         val monthTitle = view.findViewById<TextView>(R.id.monthText)
         val notesText = view.findViewById<TextView>(R.id.notesText)
+        val dotWorking = ContextCompat.getDrawable(requireContext(), R.drawable.dot_working)
+        val dotDone = ContextCompat.getDrawable(requireContext(), R.drawable.dot_done)
 
         calendarView.setup(
             startMonth = currentMonth.minusMonths(10),
@@ -86,6 +89,17 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                         container.textView.setTextColor(resources.getColor(R.color.calendar_day_inactive, null))
                         container.textView.background = null
                     }
+                }
+
+                if (day.position == DayPosition.MonthDate) {
+                    val dotDrawable = when {
+                        day.date.dayOfMonth % 2 == 0 -> dotWorking
+                        day.date.dayOfMonth % 2 != 0 -> dotDone
+                        else -> null
+                    }
+                    container.textView.setCompoundDrawablesWithIntrinsicBounds(
+                        null, null, null, dotDrawable
+                    )
                 }
             }
         }
