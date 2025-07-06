@@ -3,6 +3,7 @@ package com.example.timepay.ui.dashboard
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.example.timepay.R
 import com.kizitonwose.calendar.core.CalendarDay
@@ -14,11 +15,23 @@ import java.time.YearMonth
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
+    private var currentMonth = YearMonth.now()
+
+    private fun updateMonthText(monthText: TextView, month: YearMonth) {
+        val context = monthText.context
+        val monthName = month.month.name
+            .lowercase()
+            .replaceFirstChar { it.uppercase() }
+        monthText.text = context.getString(R.string.month_year_format, monthName, month.year)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val prevButton = view.findViewById<ImageView>(R.id.prevMonthButton)
+        val nextButton = view.findViewById<ImageView>(R.id.nextMonthButton)
         val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
-        val currentMonth = YearMonth.now()
+        val monthTitle = view.findViewById<TextView>(R.id.monthText)
 
         calendarView.setup(
             startMonth = currentMonth.minusMonths(10),
@@ -26,6 +39,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             firstDayOfWeek = DayOfWeek.MONDAY
         )
         calendarView.scrollToMonth(currentMonth)
+        updateMonthText(monthTitle, currentMonth)
 
         class DayViewContainer(view: View) : ViewContainer(view) {
             val textView: TextView = view.findViewById(R.id.calendarDayText)
@@ -37,6 +51,23 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             override fun bind(container: DayViewContainer, day: CalendarDay) {
                 container.textView.text = day.date.dayOfMonth.toString()
             }
+        }
+
+        calendarView.monthScrollListener = {
+            currentMonth = it.yearMonth
+            updateMonthText(monthTitle, currentMonth)
+        }
+
+        prevButton.setOnClickListener {
+            currentMonth = currentMonth.minusMonths(1)
+            calendarView.scrollToMonth(currentMonth)
+            updateMonthText(monthTitle, currentMonth)
+        }
+
+        nextButton.setOnClickListener {
+            currentMonth = currentMonth.plusMonths(1)
+            calendarView.scrollToMonth(currentMonth)
+            updateMonthText(monthTitle, currentMonth)
         }
     }
 }
