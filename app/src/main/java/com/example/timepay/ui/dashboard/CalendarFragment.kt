@@ -1,12 +1,15 @@
 package com.example.timepay.ui.dashboard
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.timepay.R
+import com.example.timepay.repository.CalendarDayRepository
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.view.CalendarView
 import com.kizitonwose.calendar.view.MonthDayBinder
@@ -15,11 +18,13 @@ import com.kizitonwose.calendar.core.DayPosition
 import java.time.DayOfWeek
 import java.time.YearMonth
 import java.time.LocalDate
+import kotlinx.coroutines.launch
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     private var currentMonth = YearMonth.now()
     private var selectedDate: LocalDate? = null
+    private val calendarRepository = CalendarDayRepository()
 
     private fun updateMonthText(monthText: TextView, month: YearMonth) {
         val context = monthText.context
@@ -31,6 +36,15 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        lifecycleScope.launch {
+            try {
+                val allDays = calendarRepository.getCurrentMonthDates(currentMonth)
+                Log.d("CalendarFragment", "Загружены дни: $allDays")
+            } catch (e: Exception) {
+                Log.e("CalendarFragment", "Ошибка загрузки дней", e)
+            }
+        }
 
         val prevButton = view.findViewById<ImageView>(R.id.prevMonthButton)
         val nextButton = view.findViewById<ImageView>(R.id.nextMonthButton)
