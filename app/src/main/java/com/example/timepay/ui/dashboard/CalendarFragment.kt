@@ -121,6 +121,11 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         calendarView.monthScrollListener = {
             currentMonth = it.yearMonth
             updateMonthText(monthTitle, currentMonth)
+
+            lifecycleScope.launch {
+                val days = calendarRepository.getCurrentMonthDates(currentMonth)
+                Log.d("CalendarFragment", "Загружены дни: $days")
+            }
         }
 
         prevButton.setOnClickListener {

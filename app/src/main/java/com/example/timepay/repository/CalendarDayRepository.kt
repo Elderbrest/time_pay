@@ -37,7 +37,7 @@ class CalendarDayRepository {
         val firstDay = LocalDate.of(yearMonth.year, yearMonth.month, 1)
         val lastDay = firstDay.plusMonths(1).minusDays(1)
 
-        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
         val snapshot = collectionRef()
             .whereGreaterThanOrEqualTo(FieldPath.documentId(), firstDay.format(formatter))
