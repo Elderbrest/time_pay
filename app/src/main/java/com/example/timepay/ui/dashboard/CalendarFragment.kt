@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.timepay.R
+import com.example.timepay.models.CalendarDayInfo
 import com.example.timepay.repository.CalendarDayRepository
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.view.CalendarView
@@ -19,12 +20,14 @@ import java.time.DayOfWeek
 import java.time.YearMonth
 import java.time.LocalDate
 import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     private var currentMonth = YearMonth.now()
     private var selectedDate: LocalDate? = null
     private val calendarRepository = CalendarDayRepository()
+    private var loadedDays: Map<String, CalendarDayInfo> = emptyMap()
 
     private fun updateMonthText(monthText: TextView, month: YearMonth) {
         val context = monthText.context
@@ -37,22 +40,11 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launch {
-            try {
-                val allDays = calendarRepository.getCurrentMonthDates(currentMonth)
-                Log.d("CalendarFragment", "Загружены дни: $allDays")
-            } catch (e: Exception) {
-                Log.e("CalendarFragment", "Ошибка загрузки дней", e)
-            }
-        }
-
         val prevButton = view.findViewById<ImageView>(R.id.prevMonthButton)
         val nextButton = view.findViewById<ImageView>(R.id.nextMonthButton)
         val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
         val monthTitle = view.findViewById<TextView>(R.id.monthText)
         val notesText = view.findViewById<TextView>(R.id.notesText)
-        val dotWorking = ContextCompat.getDrawable(requireContext(), R.drawable.dot_working)
-        val dotDone = ContextCompat.getDrawable(requireContext(), R.drawable.dot_done)
 
         calendarView.setup(
             startMonth = currentMonth.minusMonths(10),
@@ -81,6 +73,25 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view)
 
+            fun updateDayView(container: DayViewContainer, day: CalendarDay) {
+                val dateKey = day.date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                val dayInfo = loadedDays[dateKey]
+
+                if (dayInfo != null && day.position == DayPosition.MonthDate) {
+                    val dotDrawable = when (dayInfo.status) {
+                        "planned" -> ContextCompat.getDrawable(requireContext(), R.drawable.dot_working)
+                        "done" -> ContextCompat.getDrawable(requireContext(), R.drawable.dot_done)
+                        else -> null
+                    }
+
+                    container.textView.setCompoundDrawablesWithIntrinsicBounds(
+                        null, null, null, dotDrawable
+                    )
+                } else {
+                    container.textView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
+                }
+            }
+
             override fun bind(container: DayViewContainer, day: CalendarDay) {
                 container.textView.text = day.date.dayOfMonth.toString()
                 container.day = day
@@ -105,16 +116,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                     }
                 }
 
-                if (day.position == DayPosition.MonthDate) {
-                    val dotDrawable = when {
-                        day.date.dayOfMonth % 2 == 0 -> dotWorking
-                        day.date.dayOfMonth % 2 != 0 -> dotDone
-                        else -> null
-                    }
-                    container.textView.setCompoundDrawablesWithIntrinsicBounds(
-                        null, null, null, dotDrawable
-                    )
-                }
+                updateDayView(container, day)
             }
         }
 
@@ -124,9 +126,13 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
             lifecycleScope.launch {
                 val days = calendarRepository.getCurrentMonthDates(currentMonth)
+                loadedDays = days
                 Log.d("CalendarFragment", "Загружены дни: $days")
+                calendarView.notifyCalendarChanged()
             }
         }
+
+        Log.d("CalendarFragment", "Общие дни: $loadedDays")
 
         prevButton.setOnClickListener {
             currentMonth = currentMonth.minusMonths(1)
