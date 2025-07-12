@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.ImageView
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -26,6 +27,7 @@ import java.time.DayOfWeek
 import java.time.YearMonth
 import java.time.LocalDate
 import kotlinx.coroutines.launch
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
@@ -97,6 +99,103 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             .show()
     }
 
+    private fun showSpinnerTimePicker(
+        title: String,
+        initialTime: LocalTime,
+        onTimeSelected: (LocalTime) -> Unit
+    ) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_time_picker, null)
+        val timePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
+
+        timePicker.setIs24HourView(true)
+        timePicker.hour = initialTime.hour
+        timePicker.minute = initialTime.minute
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setView(dialogView)
+            .setPositiveButton("Сохранить") { _, _ ->
+                val selectedTime = LocalTime.of(timePicker.hour, timePicker.minute)
+                onTimeSelected(selectedTime)
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun showCompleteWorkDayDialog(date: LocalDate) {
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.dialog_work_hours, null)
+
+        val startTimeText = dialogView.findViewById<TextView>(R.id.startTimeText)
+        val endTimeText = dialogView.findViewById<TextView>(R.id.endTimeText)
+
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        var startTime = LocalTime.of(9, 0)
+        var endTime = LocalTime.of(18, 0)
+
+        startTimeText.text = "Начало: ${startTime.format(timeFormatter)}"
+        endTimeText.text = "Окончание: ${endTime.format(timeFormatter)}"
+
+        startTimeText.setOnClickListener {
+            showSpinnerTimePicker(
+                title = "Начало работы",
+                initialTime = startTime
+            ) { selected ->
+                startTime = selected
+                startTimeText.text = "Начало: ${startTime.format(timeFormatter)}"
+            }
+        }
+
+        endTimeText.setOnClickListener {
+            showSpinnerTimePicker(
+                title = "Окончание работы",
+                initialTime = endTime
+            ) { selected ->
+                endTime = selected
+                endTimeText.text = "Окончание: ${endTime.format(timeFormatter)}"
+            }
+        }
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Отметить день выполненным")
+            .setView(dialogView)
+            .setPositiveButton("Сохранить") { _, _ ->
+                saveDoneWorkDay(date, startTime, endTime)
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun reloadCalendar() {
+        lifecycleScope.launch {
+            val days = calendarRepository.getCurrentMonthDates(currentMonth)
+            loadedDays = days
+            calendarView.notifyCalendarChanged()
+        }
+    }
+
+    private fun saveDoneWorkDay(date: LocalDate, startTime: LocalTime, endTime: LocalTime) {
+        val hoursWorked = java.time.Duration.between(startTime, endTime).toMinutes() / 60.0
+
+        val updates = mapOf(
+            "status" to "done",
+            "startTime" to startTime.format(DateTimeFormatter.ofPattern("HH:mm")),
+            "endTime" to endTime.format(DateTimeFormatter.ofPattern("HH:mm")),
+            "hoursWorked" to hoursWorked
+        )
+
+        lifecycleScope.launch {
+            calendarRepository.updateDayInfo(
+                date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                updates
+            )
+
+            reloadCalendar()
+            updateActionButtons(date)
+            Toast.makeText(requireContext(), "Рабочий день отмечен выполненным!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun saveWorkDay(date: LocalDate) {
         val info = CalendarDayInfo(status = "working")
         lifecycleScope.launch {
@@ -105,10 +204,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                 info
             )
 
-            val days = calendarRepository.getCurrentMonthDates(currentMonth)
-            loadedDays = days
-            calendarView.notifyCalendarChanged()
-            Toast.makeText(requireContext(), "День успешно добавлен!", Toast.LENGTH_SHORT).show()
+            reloadCalendar()
+            Toast.makeText(requireContext(), "Рабочий день создан!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -247,7 +344,9 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
 
         completeDayButton.setOnClickListener {
-            // Отметить день как done
+            selectedDate?.let { date ->
+                showCompleteWorkDayDialog(date)
+            }
         }
     }
 }

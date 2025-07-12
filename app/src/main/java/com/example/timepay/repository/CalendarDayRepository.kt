@@ -4,6 +4,7 @@ import com.example.timepay.models.CalendarDayInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.YearMonth
@@ -31,6 +32,13 @@ class CalendarDayRepository {
 
     suspend fun saveDayInfo(date: String, info: CalendarDayInfo) {
         collectionRef().document(date).set(info).await()
+    }
+
+    suspend fun updateDayInfo(date: String, updates: Map<String, Any?>) {
+        collectionRef()
+            .document(date)
+            .set(updates, SetOptions.merge())
+            .await()
     }
 
     suspend fun getCurrentMonthDates(yearMonth: YearMonth): Map<String, CalendarDayInfo> {
