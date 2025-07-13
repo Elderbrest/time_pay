@@ -8,6 +8,7 @@ import android.text.Spanned
 import android.text.style.StyleSpan
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.ImageView
 import android.widget.TimePicker
@@ -43,6 +44,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     private lateinit var completeDayButton: FloatingActionButton
     private lateinit var removeDayButton: FloatingActionButton
     private lateinit var notesText: TextView
+    private lateinit var commentDayButton: FloatingActionButton
 
     private fun updateMonthText(monthText: TextView, month: YearMonth) {
         val context = monthText.context
@@ -282,6 +284,42 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
     }
 
+    private fun saveNoteForDay(date: LocalDate, note: String) {
+        val updates = mapOf(
+            "note" to note
+        )
+
+        lifecycleScope.launch {
+            calendarRepository.updateDayInfo(
+                date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                updates
+            )
+            reloadCalendar()
+            updateNotes(date)
+            Toast.makeText(requireContext(), "Заметка сохранена", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showEditNoteDialog(date: LocalDate) {
+        val dateKey = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val existingNote = loadedDays[dateKey]?.note ?: ""
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_note, null)
+        val noteEditText = dialogView.findViewById<EditText>(R.id.noteEditText)
+        noteEditText.setText(existingNote)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Заметка")
+            .setView(dialogView)
+            .setPositiveButton("Сохранить") { _, _ ->
+                val newNote = noteEditText.text.toString().trim()
+                saveNoteForDay(date, newNote)
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -293,6 +331,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         addDayButton = view.findViewById(R.id.addDayButton)
         completeDayButton = view.findViewById(R.id.completeDayButton)
         removeDayButton = view.findViewById(R.id.removeDayButton)
+        commentDayButton = view.findViewById(R.id.editNoteButton)
         notesText = view.findViewById(R.id.notesText)
 
         calendarView.setup(
@@ -419,6 +458,12 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         completeDayButton.setOnClickListener {
             selectedDate?.let { date ->
                 showCompleteWorkDayDialog(date)
+            }
+        }
+
+        commentDayButton.setOnClickListener {
+            selectedDate?.let { date ->
+                showEditNoteDialog(date)
             }
         }
 
