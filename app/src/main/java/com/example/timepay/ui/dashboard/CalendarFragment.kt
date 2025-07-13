@@ -425,14 +425,11 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             lifecycleScope.launch {
                 val days = calendarRepository.getCurrentMonthDates(currentMonth)
                 loadedDays = days
-                Log.d("CalendarFragment", "Загружены дни: $days")
                 calendarView.notifyCalendarChanged()
                 updateActionButtons(selectedDate)
                 updateNotes(selectedDate)
             }
         }
-
-        Log.d("CalendarFragment", "Общие дни: $loadedDays")
 
         prevButton.setOnClickListener {
             currentMonth = currentMonth.minusMonths(1)

@@ -79,10 +79,7 @@ class SettingsFragment : Fragment() {
                         binding.salaryRateInput.setText("%.2f".format(user.salaryRate))                    } else {
                         binding.salaryRateInput.setText("")
                     }
-                    
-                    android.util.Log.d("SettingsFragment", "Successfully loaded user data")
                 } else {
-                    android.util.Log.w("SettingsFragment", "Could not load user data")
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "Couldn't load your profile data", Toast.LENGTH_SHORT).show()
                     }
@@ -119,8 +116,6 @@ class SettingsFragment : Fragment() {
             val company = binding.companyInput.text.toString().trim()
             val salaryRateText = binding.salaryRateInput.text.toString().trim()
 
-            android.util.Log.d("SettingsFragment", "Preparing to save: firstName=$firstName, lastName=$lastName, company=$company")
-            
             // Simple validation for salary rate
             val salaryRate = if (salaryRateText.isNotEmpty()) {
                 try {
@@ -146,14 +141,10 @@ class SettingsFragment : Fragment() {
                         "company" to company,
                         "salaryRate" to salaryRate,
                     )
-                    
-                    android.util.Log.d("SettingsFragment", "Updating user fields: $updates")
-                    
+
                     // Update all fields in a single Firestore operation
                     userRepository.updateUserFields(updates)
-                    
-                    android.util.Log.d("SettingsFragment", "Successfully updated user fields")
-                    
+
                     // Show success toast
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "Settings updated!", Toast.LENGTH_SHORT).show()
