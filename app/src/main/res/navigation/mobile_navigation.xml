@@ -18,12 +18,6 @@
         tools:layout="@layout/fragment_calendar" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.example.timepay.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
-
-    <fragment
         android:id="@+id/navigation_settings"
         android:name="com.example.timepay.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
