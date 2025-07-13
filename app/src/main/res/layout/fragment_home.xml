@@ -103,7 +103,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Next working day"
+                        android:text="Ближайший рабочий день"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?android:attr/textColorPrimary"/>
 
@@ -112,7 +112,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="In 12 days"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textStyle="bold" />
 

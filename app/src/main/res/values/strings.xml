@@ -1,8 +1,14 @@
 <resources>
     <string name="app_name">TimePay</string>
+    <string name="login_button">LOGIN</string>
+    <string name="login_no_account">
+        Don\'t have an account?
+    </string>
+    <string name="login_sign_up_link">Sign Up</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
     <string name="title_home">Home</string>
     <string name="title_calendar">Calendar</string>
-    <string name="title_notifications">Notifications</string>
     <string name="title_settings">Settings</string>
     <string name="salary_rate">%1$s %2$s/h</string>
     <string name="currency_code">PLN</string>
