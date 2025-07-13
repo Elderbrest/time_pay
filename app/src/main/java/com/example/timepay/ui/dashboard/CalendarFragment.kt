@@ -1,5 +1,6 @@
 package com.example.timepay.ui.dashboard
 
+import android.app.AlertDialog
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.SpannableString
@@ -40,6 +41,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     private lateinit var calendarView: CalendarView
     private lateinit var addDayButton: FloatingActionButton
     private lateinit var completeDayButton: FloatingActionButton
+    private lateinit var removeDayButton: FloatingActionButton
 
     private fun updateMonthText(monthText: TextView, month: YearMonth) {
         val context = monthText.context
@@ -53,6 +55,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         if (selectedDate == null) {
             addDayButton.visibility = View.GONE
             completeDayButton.visibility = View.GONE
+            removeDayButton.visibility = View.GONE
             return
         }
 
@@ -63,14 +66,17 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             "working" -> {
                 addDayButton.visibility = View.GONE
                 completeDayButton.visibility = View.VISIBLE
+                removeDayButton.visibility = View.VISIBLE
             }
             "done" -> {
                 addDayButton.visibility = View.GONE
                 completeDayButton.visibility = View.GONE
+                removeDayButton.visibility = View.GONE
             }
             else -> {
                 addDayButton.visibility = View.VISIBLE
                 completeDayButton.visibility = View.GONE
+                removeDayButton.visibility = View.GONE
             }
         }
     }
@@ -166,12 +172,11 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             .show()
     }
 
-    private fun reloadCalendar() {
-        lifecycleScope.launch {
-            val days = calendarRepository.getCurrentMonthDates(currentMonth)
-            loadedDays = days
-            calendarView.notifyCalendarChanged()
-        }
+    private suspend fun reloadCalendar(): Map<String, CalendarDayInfo> {
+        val days = calendarRepository.getCurrentMonthDates(currentMonth)
+        loadedDays = days
+        calendarView.notifyCalendarChanged()
+        return days
     }
 
     private fun saveDoneWorkDay(date: LocalDate, startTime: LocalTime, endTime: LocalTime) {
@@ -205,9 +210,24 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             )
 
             reloadCalendar()
+            updateActionButtons(date)
             Toast.makeText(requireContext(), "Рабочий день создан!", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun removeWorkDay(date: LocalDate) {
+        lifecycleScope.launch {
+            calendarRepository.deleteDayInfo(
+                date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            )
+
+            reloadCalendar()
+            updateActionButtons(date)
+
+            Toast.makeText(requireContext(), "Рабочий день снят", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -220,6 +240,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         calendarView = view.findViewById(R.id.calendarView)
         addDayButton = view.findViewById(R.id.addDayButton)
         completeDayButton = view.findViewById(R.id.completeDayButton)
+        removeDayButton = view.findViewById(R.id.removeDayButton)
 
         calendarView.setup(
             startMonth = currentMonth.minusMonths(10),
@@ -346,6 +367,19 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         completeDayButton.setOnClickListener {
             selectedDate?.let { date ->
                 showCompleteWorkDayDialog(date)
+            }
+        }
+
+        removeDayButton.setOnClickListener {
+            selectedDate?.let { date ->
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Удалить рабочий день")
+                    .setMessage("Вы хотите снять отметку о запланированном рабочем дне?")
+                    .setPositiveButton("Удалить") { _, _ ->
+                        removeWorkDay(date)
+                    }
+                    .setNegativeButton("Отмена", null)
+                    .show()
             }
         }
     }

@@ -41,6 +41,10 @@ class CalendarDayRepository {
             .await()
     }
 
+    suspend fun deleteDayInfo(date: String) {
+        collectionRef().document(date).delete().await()
+    }
+
     suspend fun getCurrentMonthDates(yearMonth: YearMonth): Map<String, CalendarDayInfo> {
         val firstDay = LocalDate.of(yearMonth.year, yearMonth.month, 1)
         val lastDay = firstDay.plusMonths(1).minusDays(1)
