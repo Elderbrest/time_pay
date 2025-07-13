@@ -11,6 +11,11 @@
     <string name="register_confirm_password">Подтвердите пароль</string>
     <string name="register_button">Зарегистрироваться</string>
     <string name="register_login_text">Уже есть аккаунт? Войти</string>
+    <string name="home_next_working_day">Ближайший рабочий день</string>
+    <string name="home_this_week">На этой неделе</string>
+    <string name="home_this_month">В этом месяце</string>
+    <string name="home_hours">Часы</string>
+    <string name="home_earnings">Заработок</string>
     <string name="title_home">Главная</string>
     <string name="title_calendar">Календарь</string>
     <string name="title_settings">Настройки</string>

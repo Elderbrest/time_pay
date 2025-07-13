@@ -103,7 +103,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ближайший рабочий день"
+                        android:text="@string/home_next_working_day"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?android:attr/textColorPrimary"/>
 
@@ -145,7 +145,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="This Week"
+                        android:text="@string/home_this_week"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?android:attr/textColorPrimary"/>
 
@@ -172,7 +172,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Hours"
+                                android:text="@string/home_hours"
                                 android:textAppearance="?attr/textAppearanceBody2"
                                 android:textColor="?android:attr/textColorSecondary"/>
                         </LinearLayout>
@@ -194,7 +194,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Earnings"
+                                android:text="@string/home_earnings"
                                 android:textAppearance="?attr/textAppearanceBody2"
                                 android:textColor="?android:attr/textColorSecondary"/>
                         </LinearLayout>
@@ -221,7 +221,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="This Month"
+                        android:text="@string/home_this_month"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?android:attr/textColorPrimary"/>
 
@@ -248,7 +248,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Hours"
+                                android:text="@string/home_hours"
                                 android:textAppearance="?attr/textAppearanceBody2"
                                 android:textColor="?android:attr/textColorSecondary"/>
                         </LinearLayout>
@@ -270,7 +270,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Earnings"
+                                android:text="@string/home_earnings"
                                 android:textAppearance="?attr/textAppearanceBody2"
                                 android:textColor="?android:attr/textColorSecondary"/>
                         </LinearLayout>
