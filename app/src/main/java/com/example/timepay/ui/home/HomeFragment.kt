@@ -18,9 +18,14 @@ import com.example.timepay.models.User
 import com.example.timepay.databinding.FragmentHomeBinding
 import com.example.timepay.repository.PhotoRepository
 import com.example.timepay.repository.UserRepository
+import com.example.timepay.repository.CalendarDayRepository
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import android.util.Log
+import com.example.timepay.models.CalendarDayInfo
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 class HomeFragment : Fragment() {
 
@@ -28,6 +33,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private val userRepository = UserRepository()
     private val photoRepository = PhotoRepository()
+    private val calendarRepository = CalendarDayRepository()
 
     private val imagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -59,13 +65,109 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun updateNextWorkDayCard(days: Map<String, CalendarDayInfo>) {
+        val today = LocalDate.now()
+
+        val nextWorkDate = days
+            .filter { it.value.status == "working" }
+            .keys
+            .map { LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
+            .filter { it.isAfter(today) || it.isEqual(today) }
+            .minOrNull()
+
+        if (nextWorkDate != null) {
+            val daysUntil = java.time.Period.between(today, nextWorkDate).days
+
+            val inText = when (daysUntil) {
+                0 -> "Today"
+                1 -> "Tomorrow"
+                else -> "In $daysUntil days"
+            }
+
+            val formattedDate = nextWorkDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+
+            binding.nextWorkDayInText.text = inText
+            binding.nextWorkDayDateText.text = formattedDate
+        } else {
+            binding.nextWorkDayInText.text = "No planned work days"
+            binding.nextWorkDayDateText.text = ""
+        }
+    }
+
+    private fun updateWeeklyOverviewCard(
+        days: Map<String, CalendarDayInfo>,
+        user: User
+    ) {
+        val today = LocalDate.now()
+        val startOfWeek = today.with(java.time.DayOfWeek.MONDAY)
+        val endOfWeek = today.with(java.time.DayOfWeek.SUNDAY)
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+        val hours = days
+            .filterKeys { dateStr ->
+                val date = LocalDate.parse(dateStr, formatter)
+                !date.isBefore(startOfWeek) && !date.isAfter(endOfWeek)
+            }
+            .values
+            .filter { it.status == "done" }
+            .sumOf { it.hoursWorked ?: 0.0 }
+
+        val earnings = hours * user.salaryRate
+
+        val hoursText = if (hours % 1.0 == 0.0) {
+            "${hours.toInt()}"
+        } else {
+            "%.1f".format(hours)
+        }
+
+        val earningsText = if (earnings % 1.0 == 0.0) {
+            "${getString(R.string.currency_code)} ${earnings.toInt()}"
+        } else {
+            "${getString(R.string.currency_code)} %.2f".format(earnings)
+        }
+
+        binding.hoursThisWeekText.text = hoursText
+        binding.earningsThisWeekText.text = earningsText
+    }
+
+    private fun updateMonthlyOverviewCard(
+        days: Map<String, CalendarDayInfo>,
+        user: User
+    ) {
+        val hours = days.values
+            .filter { it.status == "done" }
+            .sumOf { it.hoursWorked ?: 0.0 }
+
+        val earnings = hours * user.salaryRate
+
+        val hoursText = if (hours % 1.0 == 0.0) {
+            "${hours.toInt()}"
+        } else {
+            "%.1f".format(hours)
+        }
+
+        val earningsText = if (earnings % 1.0 == 0.0) {
+            "${getString(R.string.currency_code)} ${earnings.toInt()}"
+        } else {
+            "${getString(R.string.currency_code)} %.2f".format(earnings)
+        }
+
+        binding.monthlyHoursText.text = hoursText
+        binding.monthlyEarningsText.text = earningsText
+    }
+
     private fun loadUserData() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val user = userRepository.getCurrentUserOnce()
+                val days = calendarRepository.getCurrentMonthDates(YearMonth.now())
 
                 if (user != null) {
                    showUserData(user)
+                    updateNextWorkDayCard(days)
+                    updateWeeklyOverviewCard(days, user)
+                    updateMonthlyOverviewCard(days, user)
                 } else {
                     showEmptyState()
                 }
@@ -95,7 +197,6 @@ class HomeFragment : Fragment() {
         // Monthly stats
         binding.monthlyHoursText.text = "0h"
         binding.monthlyEarningsText.text = "${getString(R.string.currency_code)} 0"
-        binding.daysWorkedText.text = "0"
 
         // Profile photo
         loadProfileImageForCurrentUser()
@@ -111,7 +212,6 @@ class HomeFragment : Fragment() {
         binding.earningsThisWeekText.text = "$0"
         binding.monthlyHoursText.text = "0h"
         binding.monthlyEarningsText.text = "$0"
-        binding.daysWorkedText.text = "0"
     }
 
     private fun showImagePickerOptions() {

@@ -58,11 +58,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fullNameText" />
 
+    <TextView
+        android:id="@+id/salaryRateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/workplaceText" />
+
     <!-- Cards Container -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="48dp"
         android:clipToPadding="false"
         android:paddingBottom="16dp"
         app:layout_constraintTop_toBottomOf="@id/workplaceText"
@@ -74,16 +85,15 @@
             android:orientation="vertical"
             android:spacing="16dp">
 
-            <!-- Salary Card -->
+            <!-- Monthly Overview Card -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/salaryCard"
+                android:id="@+id/nextWorkDayCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginBottom="32dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -93,18 +103,27 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Salary Rate"
+                        android:text="Next working day"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?android:attr/textColorPrimary"/>
 
                     <TextView
-                        android:id="@+id/salaryRateText"
+                        android:id="@+id/nextWorkDayInText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:textAppearance="?attr/textAppearanceHeadline5"
-                        android:textStyle="bold"
-                        tools:text="USD 50/h"/>
+                        android:text="In 12 days"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/nextWorkDayDateText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="25.07.2025"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="?android:attr/textColorSecondary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -253,28 +272,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Earnings"
-                                android:textAppearance="?attr/textAppearanceBody2"
-                                android:textColor="?android:attr/textColorSecondary"/>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/daysWorkedText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textAppearance="?attr/textAppearanceHeadline5"
-                                android:textStyle="bold"
-                                tools:text="20"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Days Worked"
                                 android:textAppearance="?attr/textAppearanceBody2"
                                 android:textColor="?android:attr/textColorSecondary"/>
                         </LinearLayout>
