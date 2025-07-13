@@ -42,6 +42,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     private lateinit var addDayButton: FloatingActionButton
     private lateinit var completeDayButton: FloatingActionButton
     private lateinit var removeDayButton: FloatingActionButton
+    private lateinit var notesText: TextView
 
     private fun updateMonthText(monthText: TextView, month: YearMonth) {
         val context = monthText.context
@@ -228,6 +229,58 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
     }
 
+    private fun updateNotes(date: LocalDate?) {
+        if (date == null) {
+            notesText.visibility = View.GONE
+            return
+        }
+
+        val dateKey = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val dayInfo = loadedDays[dateKey]
+
+        if (dayInfo != null) {
+            val hasNote = !dayInfo.note.isNullOrBlank()
+
+            if (dayInfo.status == "done") {
+                val start = dayInfo.startTime ?: "-"
+                val end = dayInfo.endTime ?: "-"
+                val hours = String.format("%.1f", dayInfo.hoursWorked ?: 0.0)
+                val doneText = "✅ Отработано $hours ч\n\nс $start до $end"
+
+                if (hasNote) {
+                    val label = "\n\nЗаметки:\n"
+                    val content = dayInfo.note ?: ""
+                    val spannable = SpannableString(doneText + label + content)
+                    spannable.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        doneText.length + 2, // начало "Заметки:"
+                        doneText.length + 2 + "Заметки:".length,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    notesText.text = spannable
+                } else {
+                    notesText.text = doneText
+                }
+                notesText.visibility = View.VISIBLE
+            } else if (hasNote) {
+                val label = "Заметки:\n"
+                val content = dayInfo.note ?: ""
+                val spannable = SpannableString(label + content)
+                spannable.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0,
+                    label.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                notesText.text = spannable
+                notesText.visibility = View.VISIBLE
+            } else {
+                notesText.visibility = View.GONE
+            }
+        } else {
+            notesText.visibility = View.GONE
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -235,12 +288,12 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         val prevButton = view.findViewById<ImageView>(R.id.prevMonthButton)
         val nextButton = view.findViewById<ImageView>(R.id.nextMonthButton)
         val monthTitle = view.findViewById<TextView>(R.id.monthText)
-        val notesText = view.findViewById<TextView>(R.id.notesText)
 
         calendarView = view.findViewById(R.id.calendarView)
         addDayButton = view.findViewById(R.id.addDayButton)
         completeDayButton = view.findViewById(R.id.completeDayButton)
         removeDayButton = view.findViewById(R.id.removeDayButton)
+        notesText = view.findViewById(R.id.notesText)
 
         calendarView.setup(
             startMonth = currentMonth.minusMonths(10),
@@ -254,8 +307,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         updateActionButtons(selectedDate)
 
         calendarView.notifyCalendarChanged()
-        notesText.visibility = View.VISIBLE
-        notesText.text = "Заметки для ${selectedDate}"
 
         class DayViewContainer(view: View) : ViewContainer(view) {
             lateinit var day: CalendarDay
@@ -266,11 +317,11 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                     if (day.position == DayPosition.MonthDate) {
                         selectedDate = day.date
                         calendarView.notifyCalendarChanged()
-                        notesText.visibility = View.VISIBLE
-                        notesText.text = "Заметки для ${day.date}"
                         updateActionButtons(selectedDate)
+                        updateNotes(selectedDate)
                     }
                 }
+
             }
         }
 
@@ -338,6 +389,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                 Log.d("CalendarFragment", "Загружены дни: $days")
                 calendarView.notifyCalendarChanged()
                 updateActionButtons(selectedDate)
+                updateNotes(selectedDate)
             }
         }
 
