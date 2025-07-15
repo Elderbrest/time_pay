@@ -86,7 +86,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     private fun showConfirmAddWorkDayDialog(date: LocalDate) {
         val formatted = date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-        val plainText = "Вы действительно хотите отметить $formatted как запланированный рабочий день?"
+        val plainText = getString(R.string.calendar_confirm_add_message)
         val spannable = SpannableString(plainText)
         val startFormattedIndex = plainText.indexOf(formatted)
         val endFormattedIndex = startFormattedIndex + formatted.length
@@ -99,12 +99,12 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         )
 
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Добавить рабочий день")
+            .setTitle(getString(R.string.calendar_confirm_add_title))
             .setMessage(spannable)
-            .setPositiveButton("Сохранить") { _, _ ->
+            .setPositiveButton(getString(R.string.save_button)) { _, _ ->
                 saveWorkDay(date)
             }
-            .setNegativeButton("Отмена", null)
+            .setNegativeButton(getString(R.string.cancel_button), null)
             .show()
     }
 
@@ -123,11 +123,11 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle(title)
             .setView(dialogView)
-            .setPositiveButton("Сохранить") { _, _ ->
+            .setPositiveButton(getString(R.string.save_button)) { _, _ ->
                 val selectedTime = LocalTime.of(timePicker.hour, timePicker.minute)
                 onTimeSelected(selectedTime)
             }
-            .setNegativeButton("Отмена", null)
+            .setNegativeButton(getString(R.string.cancel_button), null)
             .show()
     }
 
@@ -142,36 +142,48 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         var startTime = LocalTime.of(9, 0)
         var endTime = LocalTime.of(18, 0)
 
-        startTimeText.text = "Начало: ${startTime.format(timeFormatter)}"
-        endTimeText.text = "Окончание: ${endTime.format(timeFormatter)}"
+        startTimeText.text = getString(
+            R.string.calendar_start_time,
+            startTime.format(timeFormatter)
+        )
+        endTimeText.text = getString(
+            R.string.calendar_end_time,
+            startTime.format(timeFormatter)
+        )
 
         startTimeText.setOnClickListener {
             showSpinnerTimePicker(
-                title = "Начало работы",
+                title = getString(R.string.calendar_time_start),
                 initialTime = startTime
             ) { selected ->
                 startTime = selected
-                startTimeText.text = "Начало: ${startTime.format(timeFormatter)}"
+                startTimeText.text = getString(
+                    R.string.calendar_start_time,
+                    startTime.format(timeFormatter)
+                )
             }
         }
 
         endTimeText.setOnClickListener {
             showSpinnerTimePicker(
-                title = "Окончание работы",
+                title = getString(R.string.calendar_time_end),
                 initialTime = endTime
             ) { selected ->
                 endTime = selected
-                endTimeText.text = "Окончание: ${endTime.format(timeFormatter)}"
+                endTimeText.text = getString(
+                    R.string.calendar_end_time,
+                    startTime.format(timeFormatter)
+                )
             }
         }
 
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Отметить день выполненным")
+            .setTitle(getString(R.string.calendar_mark_done_title))
             .setView(dialogView)
-            .setPositiveButton("Сохранить") { _, _ ->
+            .setPositiveButton(getString(R.string.save_button)) { _, _ ->
                 saveDoneWorkDay(date, startTime, endTime)
             }
-            .setNegativeButton("Отмена", null)
+            .setNegativeButton(getString(R.string.cancel_button), null)
             .show()
     }
 
@@ -200,7 +212,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
             reloadCalendar()
             updateActionButtons(date)
-            Toast.makeText(requireContext(), "Рабочий день отмечен выполненным!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.calendar_day_marked_done), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -214,7 +226,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
             reloadCalendar()
             updateActionButtons(date)
-            Toast.makeText(requireContext(), "Рабочий день создан!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.calendar_day_created), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -227,7 +239,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             reloadCalendar()
             updateActionButtons(date)
 
-            Toast.makeText(requireContext(), "Рабочий день снят", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.calendar_day_removed), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -247,10 +259,15 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                 val start = dayInfo.startTime ?: "-"
                 val end = dayInfo.endTime ?: "-"
                 val hours = String.format("%.1f", dayInfo.hoursWorked ?: 0.0)
-                val doneText = "✅ Отработано $hours ч\n\nс $start до $end"
+                val doneText = getString(
+                    R.string.calendar_done_text,
+                    hours,
+                    start,
+                    end
+                )
 
                 if (hasNote) {
-                    val label = "\n\nЗаметки:\n"
+                    val label = getString(R.string.calendar_notes_label)
                     val content = dayInfo.note ?: ""
                     val spannable = SpannableString(doneText + label + content)
                     spannable.setSpan(
@@ -265,7 +282,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                 }
                 notesText.visibility = View.VISIBLE
             } else if (hasNote) {
-                val label = "Заметки:\n"
+                val label = getString(R.string.calendar_notes_label)
                 val content = dayInfo.note ?: ""
                 val spannable = SpannableString(label + content)
                 spannable.setSpan(
@@ -296,7 +313,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             )
             reloadCalendar()
             updateNotes(date)
-            Toast.makeText(requireContext(), "Заметка сохранена", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.calendar_note_saved), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -311,11 +328,11 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         AlertDialog.Builder(requireContext())
             .setTitle("Заметка")
             .setView(dialogView)
-            .setPositiveButton("Сохранить") { _, _ ->
+            .setPositiveButton(getString(R.string.save_button)) { _, _ ->
                 val newNote = noteEditText.text.toString().trim()
                 saveNoteForDay(date, newNote)
             }
-            .setNegativeButton("Отмена", null)
+            .setNegativeButton(getString(R.string.cancel_button), null)
             .show()
     }
 
@@ -448,7 +465,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             if (date != null) {
                 showConfirmAddWorkDayDialog(date)
             } else {
-                Toast.makeText(requireContext(), "Сначала выберите день", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.calendar_select_day_first), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -467,12 +484,12 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         removeDayButton.setOnClickListener {
             selectedDate?.let { date ->
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Удалить рабочий день")
-                    .setMessage("Вы хотите снять отметку о запланированном рабочем дне?")
-                    .setPositiveButton("Удалить") { _, _ ->
+                    .setTitle(getString(R.string.calendar_remove_work_title))
+                    .setMessage(getString(R.string.calendar_remove_work_message))
+                    .setPositiveButton(getString(R.string.remove_button)) { _, _ ->
                         removeWorkDay(date)
                     }
-                    .setNegativeButton("Отмена", null)
+                    .setNegativeButton(getString(R.string.cancel_button), null)
                     .show()
             }
         }

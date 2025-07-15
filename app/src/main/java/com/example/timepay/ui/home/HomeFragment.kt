@@ -79,9 +79,9 @@ class HomeFragment : Fragment() {
             val daysUntil = java.time.Period.between(today, nextWorkDate).days
 
             val inText = when (daysUntil) {
-                0 -> "Today"
-                1 -> "Tomorrow"
-                else -> "In $daysUntil days"
+                0 -> getString(R.string.home_workday_today)
+                1 -> getString(R.string.home_workday_tomorrow)
+                else -> getString(R.string.home_workday_in_days)
             }
 
             val formattedDate = nextWorkDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))

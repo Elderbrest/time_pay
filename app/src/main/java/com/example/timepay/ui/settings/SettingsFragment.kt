@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.timepay.LoginActivity
+import com.example.timepay.R
 import com.example.timepay.databinding.FragmentSettingsBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.example.timepay.repository.UserRepository
@@ -101,7 +102,11 @@ class SettingsFragment : Fragment() {
         binding.companyInput.isEnabled = !isLoading
         binding.salaryRateInput.isEnabled = !isLoading
         binding.saveSettingsButton.isEnabled = !isLoading
-        binding.saveSettingsButton.text = if (isLoading) "Loading..." else "Save"
+        binding.saveSettingsButton.text = if (isLoading) {
+            getString(R.string.loading_button)
+        } else {
+            getString(R.string.settings_save_button)
+        }
     }
     
     private fun resetUI() {
@@ -147,7 +152,7 @@ class SettingsFragment : Fragment() {
 
                     // Show success toast
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Settings updated!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, getString(R.string.settings_updated_message), Toast.LENGTH_SHORT).show()
                     }
                     
                     // Reload data to reflect changes
