@@ -14,14 +14,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5">
 
-        <!-- App Logo -->
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@mipmap/ic_launcher"
-            android:contentDescription="App Logo"
-            android:layout_marginBottom="24dp"/>
-
         <!-- App Title -->
         <TextView
             android:layout_width="wrap_content"
