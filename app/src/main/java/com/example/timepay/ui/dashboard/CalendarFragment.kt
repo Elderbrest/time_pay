@@ -86,7 +86,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     private fun showConfirmAddWorkDayDialog(date: LocalDate) {
         val formatted = date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-        val plainText = getString(R.string.calendar_confirm_add_message)
+        val plainText = getString(R.string.calendar_confirm_add_message, formatted)
         val spannable = SpannableString(plainText)
         val startFormattedIndex = plainText.indexOf(formatted)
         val endFormattedIndex = startFormattedIndex + formatted.length
