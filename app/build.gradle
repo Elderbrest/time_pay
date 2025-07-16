@@ -9,7 +9,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.timepay"
+        applicationId "com.el.timepay"
         minSdk 26
         targetSdk 34
         versionCode 1

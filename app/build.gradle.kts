@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.timepay"
+    namespace = "com.el.timepay"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.timepay"
+        applicationId = "com.el.timepay"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
