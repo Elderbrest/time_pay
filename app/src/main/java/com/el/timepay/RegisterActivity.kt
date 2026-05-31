@@ -1,13 +1,13 @@
-package com.example.timepay
+package com.el.timepay
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.timepay.databinding.ActivityRegisterBinding
-import com.example.timepay.models.User
-import com.example.timepay.repository.UserRepository
+import com.el.timepay.databinding.ActivityRegisterBinding
+import com.el.timepay.models.User
+import com.el.timepay.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.launch

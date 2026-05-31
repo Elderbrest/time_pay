@@ -1,6 +1,6 @@
-package com.example.timepay.repository
+package com.el.timepay.repository
 
-import com.example.timepay.models.CalendarDayInfo
+import com.el.timepay.models.CalendarDayInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore

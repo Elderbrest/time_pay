@@ -1,4 +1,4 @@
-package com.example.timepay.models
+package com.el.timepay.models
 
 data class User(
     val id: String = "",  // Same as Firebase Auth UID

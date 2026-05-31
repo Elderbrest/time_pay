@@ -1,4 +1,4 @@
-package com.example.timepay
+package com.el.timepay
 
 import android.app.Application
 import com.google.firebase.FirebaseApp

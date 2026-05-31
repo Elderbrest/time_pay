@@ -1,4 +1,4 @@
-package com.example.timepay.ui.home
+package com.el.timepay.ui.home
 
 import android.app.Activity
 import android.content.Intent
@@ -13,16 +13,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.timepay.R
-import com.example.timepay.models.User
-import com.example.timepay.databinding.FragmentHomeBinding
-import com.example.timepay.repository.PhotoRepository
-import com.example.timepay.repository.UserRepository
-import com.example.timepay.repository.CalendarDayRepository
+import com.el.timepay.R
+import com.el.timepay.models.User
+import com.el.timepay.databinding.FragmentHomeBinding
+import com.el.timepay.repository.PhotoRepository
+import com.el.timepay.repository.UserRepository
+import com.el.timepay.repository.CalendarDayRepository
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import android.util.Log
-import com.example.timepay.models.CalendarDayInfo
+import com.el.timepay.models.CalendarDayInfo
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter

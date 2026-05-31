@@ -1,4 +1,4 @@
-package com.example.timepay
+package com.el.timepay
 
 import android.os.Bundle
 import android.view.WindowManager
@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.core.view.WindowCompat
-import com.example.timepay.databinding.ActivityMainBinding
+import com.el.timepay.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.timepay.ui.home.HomeFragment"
+        android:name="com.el.timepay.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_calendar"
-        android:name="com.example.timepay.ui.dashboard.CalendarFragment"
+        android:name="com.el.timepay.ui.dashboard.CalendarFragment"
         android:label="@string/title_calendar"
         tools:layout="@layout/fragment_calendar" />
 
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="com.example.timepay.ui.settings.SettingsFragment"
+        android:name="com.el.timepay.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
 </navigation>

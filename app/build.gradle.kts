@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.timepay"
+    namespace = "com.el.timepay"
     compileSdk = 35
 
     defaultConfig {

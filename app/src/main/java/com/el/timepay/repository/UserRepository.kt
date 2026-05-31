@@ -1,6 +1,6 @@
-package com.example.timepay.repository
+package com.el.timepay.repository
 
-import com.example.timepay.models.User
+import com.el.timepay.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await

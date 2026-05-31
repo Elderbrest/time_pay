@@ -1,4 +1,4 @@
-package com.example.timepay.ui.dashboard
+package com.el.timepay.ui.dashboard
 
 import android.app.AlertDialog
 import android.graphics.Typeface
@@ -16,9 +16,9 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.timepay.R
-import com.example.timepay.models.CalendarDayInfo
-import com.example.timepay.repository.CalendarDayRepository
+import com.el.timepay.R
+import com.el.timepay.models.CalendarDayInfo
+import com.el.timepay.repository.CalendarDayRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.view.CalendarView

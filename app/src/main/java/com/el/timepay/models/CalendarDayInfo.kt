@@ -1,4 +1,4 @@
-package com.example.timepay.models
+package com.el.timepay.models
 
 data class CalendarDayInfo(
     val status: String = "working",

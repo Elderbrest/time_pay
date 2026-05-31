@@ -1,4 +1,4 @@
-package com.example.timepay
+package com.el.timepay
 
 import org.junit.Test
 
