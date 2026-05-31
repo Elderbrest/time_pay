@@ -1,5 +1,6 @@
 package com.el.timepay
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -8,6 +9,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.core.view.WindowCompat
 import com.el.timepay.databinding.ActivityMainBinding
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,6 +17,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            val intent = Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
+            return
+        }
 
         // Make the app draw under the system bars
         WindowCompat.setDecorFitsSystemWindows(window, false)
