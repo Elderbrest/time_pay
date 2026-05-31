@@ -1,0 +1,19 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Per-user profile image.
+    // Used by PhotoRepository to upload/delete profile_images/{uid}.jpg.
+    match /profile_images/{userId}.jpg {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+                   && request.auth.uid == userId
+                   && (request.resource == null
+                       || (request.resource.size < 5 * 1024 * 1024
+                           && request.resource.contentType.matches('image/.*')));
+    }
+
+    // Everything else: implicit deny.
+  }
+}
