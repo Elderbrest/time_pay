@@ -148,7 +148,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         )
         endTimeText.text = getString(
             R.string.calendar_end_time,
-            startTime.format(timeFormatter)
+            endTime.format(timeFormatter)
         )
 
         startTimeText.setOnClickListener {
@@ -172,7 +172,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                 endTime = selected
                 endTimeText.text = getString(
                     R.string.calendar_end_time,
-                    startTime.format(timeFormatter)
+                    endTime.format(timeFormatter)
                 )
             }
         }
@@ -270,10 +270,12 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                     val label = getString(R.string.calendar_notes_label)
                     val content = dayInfo.note ?: ""
                     val spannable = SpannableString(doneText + label + content)
+                    // Label is "\n\n<word>:\n" — bold only the "<word>:" portion,
+                    // skipping the leading "\n\n" prefix and trailing "\n".
                     spannable.setSpan(
                         StyleSpan(Typeface.BOLD),
-                        doneText.length + 2, // начало "Заметки:"
-                        doneText.length + 2 + "Заметки:".length,
+                        doneText.length + 2,
+                        doneText.length + label.length - 1,
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
                     notesText.text = spannable

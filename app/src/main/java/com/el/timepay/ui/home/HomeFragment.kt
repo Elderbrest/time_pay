@@ -161,12 +161,25 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val user = userRepository.getCurrentUserOnce()
-                val days = calendarRepository.getCurrentMonthDates(YearMonth.now())
+                val currentMonth = YearMonth.now()
+                val days = calendarRepository.getCurrentMonthDates(currentMonth)
+
+                // If the current week (Mon..Sun) spans into the previous month,
+                // fetch the previous month's data as well so weekly stats don't undercount.
+                val today = LocalDate.now()
+                val startOfWeek = today.with(java.time.DayOfWeek.MONDAY)
+                val startOfWeekMonth = YearMonth.from(startOfWeek)
+                val weeklyDays = if (startOfWeekMonth != currentMonth) {
+                    val prevMonthDays = calendarRepository.getCurrentMonthDates(startOfWeekMonth)
+                    prevMonthDays + days
+                } else {
+                    days
+                }
 
                 if (user != null) {
                    showUserData(user)
                     updateNextWorkDayCard(days)
-                    updateWeeklyOverviewCard(days, user)
+                    updateWeeklyOverviewCard(weeklyDays, user)
                     updateMonthlyOverviewCard(days, user)
                 } else {
                     showEmptyState()
@@ -270,15 +283,18 @@ class HomeFragment : Fragment() {
         val imagePath = "profile_images/$userId.jpg"
         val storageRef = com.google.firebase.storage.FirebaseStorage.getInstance().reference.child(imagePath)
         storageRef.downloadUrl.addOnSuccessListener { uri ->
+            if (!isAdded || _binding == null) return@addOnSuccessListener
             Glide.with(requireContext())
                 .load(uri)
                 .circleCrop()
                 .into(binding.profileImage)
             binding.profileInitial.visibility = View.GONE
         }.addOnFailureListener {
+            if (!isAdded || _binding == null) return@addOnFailureListener
             // fallback to initials
             viewLifecycleOwner.lifecycleScope.launch {
                 val user = userRepository.getCurrentUserOnce()
+                if (!isAdded || _binding == null) return@launch
                 user?.let {
                     showInitialsPlaceholder(it.firstName)
                 }
