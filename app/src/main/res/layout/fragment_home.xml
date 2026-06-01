@@ -53,7 +53,7 @@
         android:layout_marginTop="8dp"
         android:text="Stomatology and Co"
         android:textSize="16sp"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="?attr/colorOnSurfaceVariant"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fullNameText" />
@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="?attr/colorOnSurfaceVariant"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/workplaceText" />
@@ -104,7 +104,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/home_next_working_day"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
                         android:textColor="?android:attr/textColorPrimary"/>
 
                     <TextView
@@ -112,7 +112,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
                         android:textStyle="bold" />
 
                     <TextView
@@ -121,7 +121,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="25.07.2025"
-                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
                         android:textColor="?android:attr/textColorSecondary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -146,7 +146,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/home_this_week"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
                         android:textColor="?android:attr/textColorPrimary"/>
 
                     <LinearLayout
@@ -165,7 +165,7 @@
                                 android:id="@+id/hoursThisWeekText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="?attr/textAppearanceHeadline5"
+                                android:textAppearance="?attr/textAppearanceHeadlineSmall"
                                 android:textStyle="bold"
                                 tools:text="40h"/>
 
@@ -173,7 +173,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/home_hours"
-                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
                                 android:textColor="?android:attr/textColorSecondary"/>
                         </LinearLayout>
 
@@ -187,7 +187,7 @@
                                 android:id="@+id/earningsThisWeekText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="?attr/textAppearanceHeadline5"
+                                android:textAppearance="?attr/textAppearanceHeadlineSmall"
                                 android:textStyle="bold"
                                 tools:text="USD 2000"/>
 
@@ -195,7 +195,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/home_earnings"
-                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
                                 android:textColor="?android:attr/textColorSecondary"/>
                         </LinearLayout>
                     </LinearLayout>
@@ -222,7 +222,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/home_this_month"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
                         android:textColor="?android:attr/textColorPrimary"/>
 
                     <LinearLayout
@@ -241,7 +241,7 @@
                                 android:id="@+id/monthlyHoursText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="?attr/textAppearanceHeadline5"
+                                android:textAppearance="?attr/textAppearanceHeadlineSmall"
                                 android:textStyle="bold"
                                 tools:text="160h"/>
 
@@ -249,7 +249,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/home_hours"
-                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
                                 android:textColor="?android:attr/textColorSecondary"/>
                         </LinearLayout>
 
@@ -263,7 +263,7 @@
                                 android:id="@+id/monthlyEarningsText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="?attr/textAppearanceHeadline5"
+                                android:textAppearance="?attr/textAppearanceHeadlineSmall"
                                 android:textStyle="bold"
                                 tools:text="USD 8000"/>
 
@@ -271,7 +271,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/home_earnings"
-                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
                                 android:textColor="?android:attr/textColorSecondary"/>
                         </LinearLayout>
                     </LinearLayout>

@@ -74,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/login_no_account"
-                android:textColor="@android:color/black"/>
+                android:textColor="?attr/colorOnSurface"/>
 
             <TextView
                 android:id="@+id/signUpText"
@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:text="@string/login_sign_up_link"
-                android:textColor="@color/purple_500"
+                android:textColor="?attr/colorPrimary"
                 android:textStyle="bold"
                 android:clickable="true"
                 android:focusable="true"/>

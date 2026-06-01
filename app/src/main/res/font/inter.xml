@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Downloadable font definition for Inter via Google Fonts provider.
+    Family-level query — the system picks the right weight per child style.
+    Weights actually consumed by the app: 400 (regular), 500 (medium),
+    600 (semi-bold), 700 (bold). DESIGN.md §2 calls for body 400/500 and
+    heading 600/700; we request the family so all are available on demand.
+-->
+<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:fontProviderAuthority="com.google.android.gms.fonts"
+    app:fontProviderPackage="com.google.android.gms"
+    app:fontProviderQuery="name=Inter"
+    app:fontProviderCerts="@array/com_google_android_gms_fonts_certs" />

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        TimePay color palette — dark mode.
+        Hex values for primary/secondary/surface/on-surface come from DESIGN.md §2 (dark column).
+        Container/inverse derivations follow M3 dark-theme conventions:
+          - *_container ≈ low-chroma dark of base (~30% L) — readable card surfaces
+          - on_*_container ≈ tonal lighten of base toward 90% L — text on container
+    -->
+
+    <!-- Primary: pale forest mint (DESIGN.md §2 dark exact). -->
+    <color name="md_primary">#A7D7C5</color>
+    <color name="md_on_primary">#0F2620</color>
+    <!-- primary_container: darker forest for surfaces under primary text. -->
+    <color name="md_primary_container">#1F4438</color>
+    <color name="md_on_primary_container">#C5E9DA</color>
+
+    <!-- Secondary: lighter amber for dark mode (DESIGN.md §2 dark exact). -->
+    <color name="md_secondary">#E8A875</color>
+    <color name="md_on_secondary">#3B1F0A</color>
+    <color name="md_secondary_container">#6B3F1C</color>
+    <color name="md_on_secondary_container">#F6DCC5</color>
+
+    <!-- Tertiary: muted teal-grey, dark variant. -->
+    <color name="md_tertiary">#A8C5C7</color>
+    <color name="md_on_tertiary">#0F2122</color>
+    <color name="md_tertiary_container">#324D50</color>
+    <color name="md_on_tertiary_container">#CDDFDF</color>
+
+    <!-- Surface / background per DESIGN.md §2. -->
+    <color name="md_surface">#1F2326</color>
+    <color name="md_on_surface">#ECEDEB</color>
+    <color name="md_surface_variant">#2A2E31</color>
+    <color name="md_on_surface_variant">#9AA09D</color>
+
+    <color name="md_background">#16181A</color>
+    <color name="md_on_background">#ECEDEB</color>
+
+    <!-- Error: DESIGN.md §2 dark exact. -->
+    <color name="md_error">#F2B8B5</color>
+    <color name="md_on_error">#601410</color>
+    <color name="md_error_container">#8C1D18</color>
+    <color name="md_on_error_container">#F9DEDC</color>
+
+    <!-- Outline tokens, dark variants. -->
+    <color name="md_outline">#938F88</color>
+    <color name="md_outline_variant">#4A4845</color>
+
+    <!-- Backward-compat references. -->
+    <color name="calendar_day_active">@color/md_on_surface</color>
+    <color name="calendar_day_inactive">@color/md_on_surface_variant</color>
+</resources>

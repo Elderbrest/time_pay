@@ -1,5 +1,25 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
+    <!-- Legacy aliases retained for backward compatibility — any existing
+         layouts still referencing these continue to resolve. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- TimePay spacing scale (DESIGN.md §2). -->
+    <dimen name="space_4">4dp</dimen>
+    <dimen name="space_8">8dp</dimen>
+    <dimen name="space_12">12dp</dimen>
+    <dimen name="space_16">16dp</dimen>
+    <dimen name="space_20">20dp</dimen>
+    <dimen name="space_24">24dp</dimen>
+    <dimen name="space_32">32dp</dimen>
+    <dimen name="space_48">48dp</dimen>
+
+    <!-- Radius tokens (DESIGN.md §2). -->
+    <dimen name="radius_card">12dp</dimen>
+    <dimen name="radius_sheet">16dp</dimen>
+    <dimen name="radius_fab">20dp</dimen>
+
+    <!-- Layout tokens (DESIGN.md §2). -->
+    <dimen name="screen_padding_horizontal">20dp</dimen>
+    <dimen name="card_padding_internal">20dp</dimen>
 </resources>

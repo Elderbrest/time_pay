@@ -106,8 +106,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_logout_button"
-        android:textColor="@android:color/white"
-        app:backgroundTint="@android:color/holo_red_dark"
+        android:textColor="?attr/colorOnError"
+        app:backgroundTint="?attr/colorError"
         app:layout_constraintTop_toBottomOf="@id/saveSettingsButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

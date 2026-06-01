@@ -1,12 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <!--
+        TimePay color palette — light mode.
+        Hex values for primary/secondary/surface/on-surface come from DESIGN.md §2.
+        Container/inverse derivations follow M3 conventions:
+          - *_container ≈ tonal lighten of base toward 90% L (kept perceptually muted)
+          - on_*_container ≈ tonal darken of base toward 10% L (kept readable on container)
+        Each derivation is annotated for review.
+    -->
+
+    <!-- Utility constants (kept for backward compat with raw refs) -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="calendar_day_active">#000000</color>
-    <color name="calendar_day_inactive">#AAAAAA</color>
+
+    <!-- Primary: deep forest green (DESIGN.md §2 exact). -->
+    <color name="md_primary">#2E5D4F</color>
+    <color name="md_on_primary">#FFFFFFFF</color>
+    <!-- primary_container: lightened forest green (~90% L), still in family. -->
+    <color name="md_primary_container">#B7E1D2</color>
+    <!-- on_primary_container: darkened forest green (~10% L) for contrast. -->
+    <color name="md_on_primary_container">#0F2620</color>
+
+    <!-- Secondary: warm amber, reserved for earnings (DESIGN.md §2 exact). -->
+    <color name="md_secondary">#C97B3D</color>
+    <color name="md_on_secondary">#FFFFFFFF</color>
+    <!-- secondary_container: light amber wash (~90% L). -->
+    <color name="md_secondary_container">#F6DCC5</color>
+    <!-- on_secondary_container: deep amber (~15% L) for readable label-on-chip. -->
+    <color name="md_on_secondary_container">#3B1F0A</color>
+
+    <!-- Tertiary: neutral teal-grey, complementary to forest primary.
+         Picked as a desaturated cool counterpoint so dynamic-color tertiary
+         stays distinguishable from primary/secondary if Android 12+ overrides. -->
+    <color name="md_tertiary">#4A6B6E</color>
+    <color name="md_on_tertiary">#FFFFFFFF</color>
+    <color name="md_tertiary_container">#CDDFDF</color>
+    <color name="md_on_tertiary_container">#0F2122</color>
+
+    <!-- Surface / background.
+         surface uses DESIGN.md "surface-elevated" (#FFFFFF) so M3 cards on top
+         can tint cleanly; background uses the off-white DESIGN.md surface (#FAFAF7). -->
+    <color name="md_surface">#FFFFFF</color>
+    <color name="md_on_surface">#1A1F1D</color>
+    <!-- surface_variant: subtle wash for cards/dividers, between surface and primary tint. -->
+    <color name="md_surface_variant">#E2E7E4</color>
+    <!-- on_surface_variant matches DESIGN.md "on-surface-muted" — used for secondary text. -->
+    <color name="md_on_surface_variant">#5B6360</color>
+
+    <color name="md_background">#FAFAF7</color>
+    <color name="md_on_background">#1A1F1D</color>
+
+    <!-- Error: DESIGN.md §2 exact for destructive surfaces. -->
+    <color name="md_error">#B3261E</color>
+    <color name="md_on_error">#FFFFFFFF</color>
+    <!-- error_container: pale red wash (~90% L). -->
+    <color name="md_error_container">#F9DEDC</color>
+    <!-- on_error_container: deep red (~15% L) for chip/label-on-container text. -->
+    <color name="md_on_error_container">#410E0B</color>
+
+    <!-- Outline tokens for borders/dividers (M3 conventional values tuned to muted token). -->
+    <color name="md_outline">#79766F</color>
+    <color name="md_outline_variant">#CAC4BC</color>
+
+    <!-- Backward-compat references — keep names, redirect to semantic tokens. -->
+    <color name="calendar_day_active">@color/md_on_surface</color>
+    <color name="calendar_day_inactive">@color/md_on_surface_variant</color>
 </resources>

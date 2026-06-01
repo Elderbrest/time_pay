@@ -106,7 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/register_login_text"
-            android:textColor="@android:color/black"
+            android:textColor="?attr/colorOnSurface"
             android:clickable="true"
             android:focusable="true"/>
 
