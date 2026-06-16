@@ -1,7 +1,6 @@
 package com.el.timepay
 
 import android.app.Application
-import com.google.android.material.color.DynamicColors
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -10,11 +9,6 @@ class TimePayApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         FirebaseApp.initializeApp(this)
-
-        // Opt every Activity into Material You wallpaper-derived theming
-        // on Android 12+; no-op on older devices, where our forest-green
-        // brand palette from Theme.TimePay remains the fallback.
-        DynamicColors.applyToActivitiesIfAvailable(this)
 
         val settings = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)
