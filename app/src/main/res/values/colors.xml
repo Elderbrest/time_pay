@@ -29,38 +29,51 @@
     <!-- on_secondary_container: deep amber (~15% L) for readable label-on-chip. -->
     <color name="md_on_secondary_container">#3B1F0A</color>
 
-    <!-- Tertiary: neutral teal-grey, complementary to forest primary.
-         Picked as a desaturated cool counterpoint so dynamic-color tertiary
-         stays distinguishable from primary/secondary if Android 12+ overrides. -->
-    <color name="md_tertiary">#4A6B6E</color>
+    <!-- Tertiary: warm hazel-brown (TimePay System / v2 exact).
+         Provides a warm counterpoint to the forest primary and ties to the
+         "bespoke stationery" warmth of the v2 design system. -->
+    <color name="md_tertiary">#5E312A</color>
     <color name="md_on_tertiary">#FFFFFFFF</color>
-    <color name="md_tertiary_container">#CDDFDF</color>
-    <color name="md_on_tertiary_container">#0F2122</color>
+    <color name="md_tertiary_container">#794740</color>
+    <color name="md_on_tertiary_container">#FCB9AF</color>
 
-    <!-- Surface / background.
-         surface uses DESIGN.md "surface-elevated" (#FFFFFF) so M3 cards on top
-         can tint cleanly; background uses the off-white DESIGN.md surface (#FAFAF7). -->
-    <color name="md_surface">#FFFFFF</color>
-    <color name="md_on_surface">#1A1F1D</color>
-    <!-- surface_variant: subtle wash for cards/dividers, between surface and primary tint. -->
-    <color name="md_surface_variant">#E2E7E4</color>
-    <!-- on_surface_variant matches DESIGN.md "on-surface-muted" — used for secondary text. -->
-    <color name="md_on_surface_variant">#5B6360</color>
+    <!-- Surface / background (v2 exact).
+         v2 uses a single off-white (#F9FAF7) base for both surface and background
+         — a softer, more "paper-like" reading surface than pure white. Card
+         elevation is expressed through the surface-container tonal ladder below. -->
+    <color name="md_surface">#F9FAF7</color>
+    <color name="md_on_surface">#1A1C1B</color>
+    <!-- surface_variant: subtle wash for cards/dividers. -->
+    <color name="md_surface_variant">#E2E3E0</color>
+    <!-- on_surface_variant — used for secondary text. -->
+    <color name="md_on_surface_variant">#404945</color>
 
-    <color name="md_background">#FAFAF7</color>
-    <color name="md_on_background">#1A1F1D</color>
+    <color name="md_background">#F9FAF7</color>
+    <color name="md_on_background">#1A1C1B</color>
 
-    <!-- Error: DESIGN.md §2 exact for destructive surfaces. -->
-    <color name="md_error">#B3261E</color>
+    <!-- Surface-container tonal ladder (v2 exact). Replaces drop shadows:
+         depth is expressed by stepping cards up this ladder rather than lifting. -->
+    <color name="md_surface_dim">#D9DAD8</color>
+    <color name="md_surface_bright">#F9FAF7</color>
+    <color name="md_surface_container_lowest">#FFFFFF</color>
+    <color name="md_surface_container_low">#F3F4F1</color>
+    <color name="md_surface_container">#EDEEEC</color>
+    <color name="md_surface_container_high">#E7E8E6</color>
+    <color name="md_surface_container_highest">#E2E3E0</color>
+
+    <!-- Inverse surfaces (v2 exact) — used by snackbars / inverse components. -->
+    <color name="md_inverse_surface">#2E312F</color>
+    <color name="md_inverse_on_surface">#F0F1EE</color>
+
+    <!-- Error (v2 exact for destructive surfaces). -->
+    <color name="md_error">#BA1A1A</color>
     <color name="md_on_error">#FFFFFFFF</color>
-    <!-- error_container: pale red wash (~90% L). -->
-    <color name="md_error_container">#F9DEDC</color>
-    <!-- on_error_container: deep red (~15% L) for chip/label-on-container text. -->
-    <color name="md_on_error_container">#410E0B</color>
+    <color name="md_error_container">#FFDAD6</color>
+    <color name="md_on_error_container">#93000A</color>
 
-    <!-- Outline tokens for borders/dividers (M3 conventional values tuned to muted token). -->
-    <color name="md_outline">#79766F</color>
-    <color name="md_outline_variant">#CAC4BC</color>
+    <!-- Outline tokens for borders/dividers (v2 exact). -->
+    <color name="md_outline">#707975</color>
+    <color name="md_outline_variant">#C0C8C4</color>
 
     <!-- Backward-compat references — keep names, redirect to semantic tokens. -->
     <color name="calendar_day_active">@color/md_on_surface</color>

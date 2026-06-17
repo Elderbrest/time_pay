@@ -14,8 +14,11 @@
     <dimen name="space_32">32dp</dimen>
     <dimen name="space_48">48dp</dimen>
 
-    <!-- Radius tokens (DESIGN.md §2). -->
-    <dimen name="radius_card">12dp</dimen>
+    <!-- Radius tokens (TimePay System / v2): 8dp small components, 16dp containers.
+         "8px for small components like inputs and buttons, scaling to 16px for
+         containers and cards." -->
+    <dimen name="radius_small">8dp</dimen>
+    <dimen name="radius_card">16dp</dimen>
     <dimen name="radius_sheet">16dp</dimen>
     <dimen name="radius_fab">20dp</dimen>
 

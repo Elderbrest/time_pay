@@ -21,13 +21,14 @@
     <color name="md_secondary_container">#6B3F1C</color>
     <color name="md_on_secondary_container">#F6DCC5</color>
 
-    <!-- Tertiary: muted teal-grey, dark variant. -->
-    <color name="md_tertiary">#A8C5C7</color>
-    <color name="md_on_tertiary">#0F2122</color>
-    <color name="md_tertiary_container">#324D50</color>
-    <color name="md_on_tertiary_container">#CDDFDF</color>
+    <!-- Tertiary: warm hazel/peach — dark counterpart of the v2 light hazel-brown
+         (derived from v2 tertiary-fixed-dim #F9B6AC / tertiary-fixed #FFDAD5). -->
+    <color name="md_tertiary">#F9B6AC</color>
+    <color name="md_on_tertiary">#34100B</color>
+    <color name="md_tertiary_container">#693A33</color>
+    <color name="md_on_tertiary_container">#FFDAD5</color>
 
-    <!-- Surface / background per DESIGN.md §2. -->
+    <!-- Surface / background — dark, kept tonally consistent with existing charcoal. -->
     <color name="md_surface">#1F2326</color>
     <color name="md_on_surface">#ECEDEB</color>
     <color name="md_surface_variant">#2A2E31</color>
@@ -36,7 +37,21 @@
     <color name="md_background">#16181A</color>
     <color name="md_on_background">#ECEDEB</color>
 
-    <!-- Error: DESIGN.md §2 dark exact. -->
+    <!-- Surface-container tonal ladder (dark) — symmetric token names with light mode,
+         stepping up from the dark base so cards read as raised tonal layers. -->
+    <color name="md_surface_dim">#16181A</color>
+    <color name="md_surface_bright">#3B3F3D</color>
+    <color name="md_surface_container_lowest">#111315</color>
+    <color name="md_surface_container_low">#1E2321</color>
+    <color name="md_surface_container">#222826</color>
+    <color name="md_surface_container_high">#2C322F</color>
+    <color name="md_surface_container_highest">#373D3A</color>
+
+    <!-- Inverse surfaces (dark) — light surface for inverse components. -->
+    <color name="md_inverse_surface">#ECEDEB</color>
+    <color name="md_inverse_on_surface">#2E312F</color>
+
+    <!-- Error: dark variant. -->
     <color name="md_error">#F2B8B5</color>
     <color name="md_on_error">#601410</color>
     <color name="md_error_container">#8C1D18</color>
