@@ -1,10 +1,19 @@
 <resources>
     <string name="app_name">TimePay</string>
-    <string name="login_button">LOGIN</string>
+    <string name="login_button">Log in</string>
     <string name="login_no_account">Don\'t have an account?</string>
-    <string name="login_sign_up_link">Sign Up</string>
+    <string name="login_sign_up_link">Sign up</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
+    <string name="login_welcome_title">Welcome back</string>
+    <string name="login_welcome_subtitle">Log in to manage your professional payments.</string>
+    <string name="login_email_address">Email Address</string>
+    <string name="login_email_hint">name@example.com</string>
+    <string name="login_forgot_password">Forgot password?</string>
+    <string name="login_footer_privacy">Privacy</string>
+    <string name="login_footer_terms">Terms</string>
+    <string name="login_footer_security">Security</string>
+    <string name="coming_soon">Coming soon</string>
     <string name="register_full_name">Full Name</string>
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>

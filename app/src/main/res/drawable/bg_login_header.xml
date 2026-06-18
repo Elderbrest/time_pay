@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Login header banner — solid forest-green block behind the white wordmark.
+    A faint diagonal sheen (very low-opacity white gradient) stands in for the
+    tiled watermark pattern in the Stitch mock: just enough texture to keep the
+    flat green from reading as a plain rectangle.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Solid forest-green base. -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/colorPrimary" />
+        </shape>
+    </item>
+
+    <!-- Subtle diagonal sheen for depth. -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="45"
+                android:startColor="#10FFFFFF"
+                android:centerColor="#00FFFFFF"
+                android:endColor="#0CFFFFFF" />
+        </shape>
+    </item>
+
+</layer-list>

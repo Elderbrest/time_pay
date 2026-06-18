@@ -51,6 +51,10 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
+        binding.forgotPasswordText.setOnClickListener {
+            Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
+        }
+
         // Set click listener for sign up text
         binding.signUpText.setOnClickListener { view ->
             try {
