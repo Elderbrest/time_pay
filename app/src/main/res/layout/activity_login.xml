@@ -36,7 +36,7 @@
         android:layout_marginEnd="@dimen/space_24"
         app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
         app:cardCornerRadius="@dimen/radius_small"
-        app:cardElevation="@dimen/space_8"
+        app:cardElevation="@dimen/elevation_card_soft"
         app:strokeColor="?attr/colorOutlineVariant"
         app:strokeWidth="1dp"
         app:layout_constraintEnd_toEndOf="parent"

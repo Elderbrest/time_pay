@@ -21,6 +21,10 @@
     <!-- 12dp: rounded-rectangle radius for login inputs/button (Stitch login mock). -->
     <dimen name="radius_field">12dp</dimen>
     <dimen name="radius_card">16dp</dimen>
+
+    <!-- Soft, even ambient card shadow for the auth cards — kept low so the
+         shadow reads as a gentle halo rather than a deep pool below the card. -->
+    <dimen name="elevation_card_soft">2dp</dimen>
     <dimen name="radius_sheet">16dp</dimen>
     <dimen name="radius_fab">20dp</dimen>
 
