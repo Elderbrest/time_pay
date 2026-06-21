@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Bottom-navigation item tint selector.
+    Checked (active) tab uses the forest primary; inactive tabs fall back to
+    the muted on-surface-variant so they read as secondary.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/colorPrimary" android:state_checked="true" />
+    <item android:color="?attr/colorOnSurfaceVariant" />
+</selector>

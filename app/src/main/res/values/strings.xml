@@ -34,6 +34,20 @@
     <string name="home_this_month">This Month</string>
     <string name="home_hours">Hours</string>
     <string name="home_earnings">Earnings</string>
+    <string name="home_good_morning">Good morning</string>
+    <string name="home_earned_this_month">Earned this month</string>
+    <string name="home_log_today">Log today\'s hours</string>
+    <string name="home_next_shift">Next shift</string>
+    <string name="home_shift_chip">Shift</string>
+    <string name="home_days_suffix">days</string>
+    <string name="home_hours_logged_separator"> h logged · </string>
+    <string name="home_hours_short">%1$s h</string>
+    <string name="home_shift_window">%1$s – %2$s</string>
+    <string name="home_shift_window_hours">%1$s – %2$s · %3$s h</string>
+    <string name="home_no_planned_days">No planned work days</string>
+    <string name="home_add_workplace">Add your workplace</string>
+    <string name="home_set_rate">Set your rate</string>
+    <string name="home_default_user">User</string>
     <string name="calendar_confirm_add_title">Add Work Day</string>
     <string name="calendar_confirm_add_message">Do you really want to mark %1$s as a planned work day?</string>
     <string name="calendar_mark_done_title">Mark Day as Completed</string>
@@ -59,8 +73,14 @@
     <string name="settings_logout_button">Logout</string>
     <string name="settings_updated_message">Settings updated</string>
     <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
     <string name="title_calendar">Calendar</string>
+    <string name="title_reports">Reports</string>
     <string name="title_settings">Settings</string>
+
+    <!-- Reports tab — coming-soon placeholder. -->
+    <string name="reports_coming_soon_title">Coming soon</string>
+    <string name="reports_coming_soon_body">Charts of your hours and earnings are on the way.</string>
     <string name="salary_rate">%1$s %2$s/h</string>
     <string name="currency_code">PLN</string>
     <string name="month_year_format">%1$s %2$d</string>

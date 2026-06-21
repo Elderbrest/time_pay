@@ -1,282 +1,427 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:background="?attr/colorSurfaceBright"
+    android:clipToPadding="false"
+    android:fillViewport="true"
     tools:context=".ui.home.HomeFragment">
 
-    <FrameLayout
-        android:id="@+id/profileAvatar"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/profileImage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/circle_background"
-            app:shapeAppearanceOverlay="@style/CircularImageView" />
-
-        <TextView
-            android:id="@+id/profileInitial"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:textSize="48sp"
-            android:textColor="#757575"
-            android:textStyle="bold"
-            android:visibility="gone"/>
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/fullNameText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileAvatar" />
-
-    <TextView
-        android:id="@+id/workplaceText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Stomatology and Co"
-        android:textSize="16sp"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fullNameText" />
-
-    <TextView
-        android:id="@+id/salaryRateText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textSize="14sp"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/workplaceText" />
-
-    <!-- Cards Container -->
-    <androidx.core.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="48dp"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@id/workplaceText"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/space_20"
+        android:paddingTop="@dimen/space_24"
+        android:paddingBottom="96dp">
 
+        <!-- Greeting row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:spacing="16dp">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <!-- Monthly Overview Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/nextWorkDayCard"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_good_morning"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <TextView
+                    android:id="@+id/fullNameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_4"
+                    android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold"
+                    tools:text="Anna" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_4"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/workplaceText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        tools:text="Stomatology and Co" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/space_4"
+                        android:text="·"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/salaryRateText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        tools:text="23 PLN/h" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/profileAvatar"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="@dimen/space_12"
+                android:background="@drawable/bg_avatar_ring">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/profileImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="1dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/circle_background"
+                    app:shapeAppearanceOverlay="@style/CircularImageView" />
+
+                <TextView
+                    android:id="@+id/profileInitial"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Earnings hero card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_24"
+            app:cardBackgroundColor="@color/md_primary_container"
+            app:cardCornerRadius="@dimen/radius_card"
+            app:cardElevation="@dimen/elevation_card_soft"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginBottom="32dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:padding="@dimen/space_20">
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:alpha="0.7"
+                    android:letterSpacing="0.08"
+                    android:text="@string/home_earned_this_month"
+                    android:textAllCaps="true"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="@color/md_on_primary_container" />
+
+                <TextView
+                    android:id="@+id/monthlyEarningsText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:fontFeatureSettings="tnum"
+                    android:textAppearance="?attr/textAppearanceDisplaySmall"
+                    android:textColor="@color/md_secondary"
+                    android:textStyle="bold"
+                    tools:text="PLN 2944" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="@dimen/space_8"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_more_time"
+                        app:tint="@color/md_on_primary_container" />
 
                     <TextView
+                        android:id="@+id/monthlyHoursText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/home_next_working_day"
-                        android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textColor="?android:attr/textColorPrimary"/>
-
-                    <TextView
-                        android:id="@+id/nextWorkDayInText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/nextWorkDayDateText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="25.07.2025"
+                        android:fontFeatureSettings="tnum"
                         android:textAppearance="?attr/textAppearanceBodyMedium"
-                        android:textColor="?android:attr/textColorSecondary" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:textColor="@color/md_on_primary_container"
+                        tools:text="128" />
 
-            <!-- Statistics Card -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_hours_logged_separator"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="@color/md_on_primary_container" />
+
+                    <TextView
+                        android:id="@+id/monthlyDaysText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFeatureSettings="tnum"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="@color/md_on_primary_container"
+                        tools:text="16" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_4"
+                        android:text="@string/home_days_suffix"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="@color/md_on_primary_container" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Log today's hours -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/logTodayButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="@dimen/space_16"
+            android:backgroundTint="@color/md_secondary_container"
+            android:text="@string/home_log_today"
+            android:textColor="?attr/colorOnSecondaryContainer"
+            app:cornerRadius="@dimen/radius_small"
+            app:icon="@drawable/ic_more_time"
+            app:iconGravity="textStart"
+            app:iconTint="?attr/colorOnSecondaryContainer" />
+
+        <!-- Stat cards: This week + This month, side by side -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_16"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <!-- This week -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/statisticsCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginBottom="32dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/space_8"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="@dimen/elevation_card_soft"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/space_16">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:letterSpacing="0.08"
                         android:text="@string/home_this_week"
-                        android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textColor="?android:attr/textColorPrimary"/>
+                        android:textAllCaps="true"
+                        android:textAppearance="?attr/textAppearanceLabelMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/hoursThisWeekText"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal">
+                        android:layout_marginTop="@dimen/space_12"
+                        android:fontFeatureSettings="tnum"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textStyle="bold"
+                        tools:text="40 h" />
 
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/hoursThisWeekText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                                android:textStyle="bold"
-                                tools:text="40h"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/home_hours"
-                                android:textAppearance="?attr/textAppearanceBodyMedium"
-                                android:textColor="?android:attr/textColorSecondary"/>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/earningsThisWeekText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                                android:textStyle="bold"
-                                tools:text="USD 2000"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/home_earnings"
-                                android:textAppearance="?attr/textAppearanceBodyMedium"
-                                android:textColor="?android:attr/textColorSecondary"/>
-                        </LinearLayout>
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/earningsThisWeekText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:fontFeatureSettings="tnum"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="@color/md_secondary"
+                        android:textStyle="bold"
+                        tools:text="PLN 920" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Monthly Overview Card -->
+            <!-- This month -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/monthlyOverviewCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginBottom="32dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/space_8"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="@dimen/elevation_card_soft"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/space_16">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:letterSpacing="0.08"
                         android:text="@string/home_this_month"
-                        android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textColor="?android:attr/textColorPrimary"/>
+                        android:textAllCaps="true"
+                        android:textAppearance="?attr/textAppearanceLabelMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/monthHoursCardText"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal">
+                        android:layout_marginTop="@dimen/space_12"
+                        android:fontFeatureSettings="tnum"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textStyle="bold"
+                        tools:text="128 h" />
 
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/monthlyHoursText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                                android:textStyle="bold"
-                                tools:text="160h"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/home_hours"
-                                android:textAppearance="?attr/textAppearanceBodyMedium"
-                                android:textColor="?android:attr/textColorSecondary"/>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/monthlyEarningsText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                                android:textStyle="bold"
-                                tools:text="USD 8000"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/home_earnings"
-                                android:textAppearance="?attr/textAppearanceBodyMedium"
-                                android:textColor="?android:attr/textColorSecondary"/>
-                        </LinearLayout>
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/monthEarningsCardText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:fontFeatureSettings="tnum"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="@color/md_secondary"
+                        android:textStyle="bold"
+                        tools:text="PLN 4 820" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Next shift card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/nextWorkDayCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_16"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+            app:cardCornerRadius="@dimen/radius_card"
+            app:cardElevation="@dimen/elevation_card_soft"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_16">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.08"
+                    android:text="@string/home_next_shift"
+                    android:textAllCaps="true"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/nextWorkDayDateText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold"
+                            tools:text="25.07.2025" />
+
+                        <TextView
+                            android:id="@+id/nextWorkDayInText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_4"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            tools:text="In 3 days" />
+
+                        <TextView
+                            android:id="@+id/nextShiftTimeText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_4"
+                            android:fontFeatureSettings="tnum"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="@color/md_secondary"
+                            android:textStyle="bold"
+                            android:visibility="gone"
+                            tools:text="08:00 – 16:00 · 8h"
+                            tools:visibility="visible" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_pill"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/space_12"
+                        android:paddingVertical="@dimen/space_8">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginEnd="@dimen/space_4"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_calendar_black_24dp"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_shift_chip"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>

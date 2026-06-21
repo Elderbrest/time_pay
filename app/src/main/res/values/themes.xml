@@ -95,4 +95,31 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <!--
+        Bottom navigation (TimePay v2).
+        Light surface fill, always-visible labels, M3 active-indicator pill
+        tinted with the lighter green container so the forest icon/label stay
+        legible on it. Icon + label color comes from the checked/unchecked
+        selector in res/color/bottom_nav_item_color.xml.
+    -->
+    <style name="Widget.TimePay.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">?attr/colorSurfaceContainerLowest</item>
+        <item name="elevation">0dp</item>
+        <item name="labelVisibilityMode">labeled</item>
+        <item name="itemIconTint">@color/bottom_nav_item_color</item>
+        <item name="itemTextColor">@color/bottom_nav_item_color</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.TimePay.BottomNav.ActiveIndicator</item>
+    </style>
+
+    <!-- Active-indicator pill behind the selected icon. -->
+    <style name="Widget.TimePay.BottomNav.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/md_primary_container</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.TimePay.BottomNav.ActiveIndicator</item>
+    </style>
+
+    <style name="ShapeAppearance.TimePay.BottomNav.ActiveIndicator" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

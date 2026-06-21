@@ -18,6 +18,12 @@
         tools:layout="@layout/fragment_calendar" />
 
     <fragment
+        android:id="@+id/navigation_reports"
+        android:name="com.el.timepay.ui.reports.ReportsFragment"
+        android:label="@string/title_reports"
+        tools:layout="@layout/fragment_reports" />
+
+    <fragment
         android:id="@+id/navigation_settings"
         android:name="com.el.timepay.ui.settings.SettingsFragment"
         android:label="@string/title_settings"

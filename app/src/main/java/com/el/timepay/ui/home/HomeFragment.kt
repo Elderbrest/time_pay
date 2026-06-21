@@ -63,6 +63,10 @@ class HomeFragment : Fragment() {
         binding.profileImage.setOnClickListener {
             showImagePickerOptions()
         }
+
+        binding.logTodayButton.setOnClickListener {
+            Toast.makeText(context, R.string.coming_soon, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun updateNextWorkDayCard(days: Map<String, CalendarDayInfo>) {
@@ -76,23 +80,46 @@ class HomeFragment : Fragment() {
             .minOrNull()
 
         if (nextWorkDate != null) {
-            val daysUntil = java.time.Period.between(today, nextWorkDate).days
+            val daysUntil = java.time.temporal.ChronoUnit.DAYS.between(today, nextWorkDate).toInt()
 
             val inText = when (daysUntil) {
                 0 -> getString(R.string.home_workday_today)
                 1 -> getString(R.string.home_workday_tomorrow)
-                else -> getString(R.string.home_workday_in_days)
+                else -> getString(R.string.home_workday_in_days, daysUntil)
             }
 
             val formattedDate = nextWorkDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
 
             binding.nextWorkDayInText.text = inText
             binding.nextWorkDayDateText.text = formattedDate
+
+            // Planned time window (only if both times are set on that day)
+            val dateKey = nextWorkDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            val info = days[dateKey]
+            val start = info?.startTime
+            val end = info?.endTime
+            if (!start.isNullOrBlank() && !end.isNullOrBlank()) {
+                val hours = info.hoursWorked
+                binding.nextShiftTimeText.text = if (hours != null && hours > 0) {
+                    getString(R.string.home_shift_window_hours, start, end, formatHours(hours))
+                } else {
+                    getString(R.string.home_shift_window, start, end)
+                }
+                binding.nextShiftTimeText.visibility = View.VISIBLE
+            } else {
+                binding.nextShiftTimeText.visibility = View.GONE
+            }
         } else {
-            binding.nextWorkDayInText.text = "No planned work days"
+            binding.nextWorkDayInText.text = getString(R.string.home_no_planned_days)
             binding.nextWorkDayDateText.text = ""
+            binding.nextShiftTimeText.visibility = View.GONE
         }
     }
+
+    /** Formats hours without a trailing ".0" (8.0 -> "8", 8.5 -> "8.5"), locale-stable. */
+    private fun formatHours(hours: Double): String =
+        if (hours % 1.0 == 0.0) hours.toInt().toString()
+        else String.format(java.util.Locale.US, "%.1f", hours)
 
     private fun updateWeeklyOverviewCard(
         days: Map<String, CalendarDayInfo>,
@@ -115,20 +142,15 @@ class HomeFragment : Fragment() {
 
         val earnings = hours * user.salaryRate
 
-        val hoursText = if (hours % 1.0 == 0.0) {
-            "${hours.toInt()}"
-        } else {
-            "%.1f".format(hours)
-        }
+        binding.hoursThisWeekText.text = getString(R.string.home_hours_short, formatHours(hours))
+        binding.earningsThisWeekText.text = formatEarnings(earnings)
+    }
 
-        val earningsText = if (earnings % 1.0 == 0.0) {
-            "${getString(R.string.currency_code)} ${earnings.toInt()}"
-        } else {
-            "${getString(R.string.currency_code)} %.2f".format(earnings)
-        }
-
-        binding.hoursThisWeekText.text = hoursText
-        binding.earningsThisWeekText.text = earningsText
+    /** "PLN 920" / "PLN 920.50", locale-stable. */
+    private fun formatEarnings(earnings: Double): String {
+        val code = getString(R.string.currency_code)
+        return if (earnings % 1.0 == 0.0) "$code ${earnings.toInt()}"
+        else "$code " + String.format(java.util.Locale.US, "%.2f", earnings)
     }
 
     private fun updateMonthlyOverviewCard(
@@ -139,22 +161,19 @@ class HomeFragment : Fragment() {
             .filter { it.status == "done" }
             .sumOf { it.hoursWorked ?: 0.0 }
 
+        val daysWorked = days.values.count { it.status == "done" }
+
         val earnings = hours * user.salaryRate
-
-        val hoursText = if (hours % 1.0 == 0.0) {
-            "${hours.toInt()}"
-        } else {
-            "%.1f".format(hours)
-        }
-
-        val earningsText = if (earnings % 1.0 == 0.0) {
-            "${getString(R.string.currency_code)} ${earnings.toInt()}"
-        } else {
-            "${getString(R.string.currency_code)} %.2f".format(earnings)
-        }
+        val hoursText = formatHours(hours)
+        val earningsText = formatEarnings(earnings)
 
         binding.monthlyHoursText.text = hoursText
         binding.monthlyEarningsText.text = earningsText
+        binding.monthlyDaysText.text = daysWorked.toString()
+
+        // This-month stat card (same data, distinct views from the hero)
+        binding.monthHoursCardText.text = getString(R.string.home_hours_short, hoursText)
+        binding.monthEarningsCardText.text = earningsText
     }
 
     private fun loadUserData() {
@@ -194,22 +213,16 @@ class HomeFragment : Fragment() {
     private fun showUserData(user: User) {
         // Full name
         val fullName = "${user.firstName} ${user.lastName}".trim()
-        binding.fullNameText.text = if (fullName.isNotBlank()) fullName else "User"
+        binding.fullNameText.text = if (fullName.isNotBlank()) fullName else getString(R.string.home_default_user)
 
         // Company
-        binding.workplaceText.text = user.company.ifEmpty { "Add your workplace" }
+        binding.workplaceText.text = user.company.ifEmpty { getString(R.string.home_add_workplace) }
 
         // Salary rate
-        val formattedRate = "%.2f".format(user.salaryRate)
+        val formattedRate = String.format(java.util.Locale.US, "%.2f", user.salaryRate)
         binding.salaryRateText.text = getString(R.string.salary_rate, getString(R.string.currency_code), formattedRate)
 
-        // Weekly stats
-        binding.hoursThisWeekText.text = "0h"
-        binding.earningsThisWeekText.text = "${getString(R.string.currency_code)} 0"
-
-        // Monthly stats
-        binding.monthlyHoursText.text = "0h"
-        binding.monthlyEarningsText.text = "${getString(R.string.currency_code)} 0"
+        resetStats()
 
         // Profile photo
         loadProfileImageForCurrentUser()
@@ -217,14 +230,24 @@ class HomeFragment : Fragment() {
 
     private fun showEmptyState() {
         Log.w("HomeFragment", "No user data available")
-        binding.fullNameText.text = "User"
-        binding.workplaceText.text = "Add your workplace"
-        binding.salaryRateText.text = "Set your rate"
+        binding.fullNameText.text = getString(R.string.home_default_user)
+        binding.workplaceText.text = getString(R.string.home_add_workplace)
+        binding.salaryRateText.text = getString(R.string.home_set_rate)
+        resetStats()
+    }
 
-        binding.hoursThisWeekText.text = "0h"
-        binding.earningsThisWeekText.text = "$0"
-        binding.monthlyHoursText.text = "0h"
-        binding.monthlyEarningsText.text = "$0"
+    /** Zeroed placeholders shown before/without real data. */
+    private fun resetStats() {
+        val zeroHours = getString(R.string.home_hours_short, "0")
+        val zeroEarnings = formatEarnings(0.0)
+        binding.hoursThisWeekText.text = zeroHours
+        binding.earningsThisWeekText.text = zeroEarnings
+        binding.monthlyHoursText.text = "0"
+        binding.monthlyDaysText.text = "0"
+        binding.monthlyEarningsText.text = zeroEarnings
+        binding.monthHoursCardText.text = zeroHours
+        binding.monthEarningsCardText.text = zeroEarnings
+        binding.nextShiftTimeText.visibility = View.GONE
     }
 
     private fun showImagePickerOptions() {
