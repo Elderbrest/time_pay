@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/space_20"
-        android:paddingTop="@dimen/space_24"
+        android:paddingTop="@dimen/space_48"
         android:paddingBottom="96dp">
 
         <!-- Greeting row -->
