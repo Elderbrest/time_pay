@@ -35,7 +35,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/home_good_morning"
                     android:textAppearance="?attr/textAppearanceLabelMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/fullNameText"
@@ -46,38 +47,6 @@
                     android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold"
                     tools:text="Anna" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_4"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/workplaceText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        tools:text="Stomatology and Co" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/space_4"
-                        android:text="·"
-                        android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-
-                    <TextView
-                        android:id="@+id/salaryRateText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        tools:text="23 PLN/h" />
-                </LinearLayout>
             </LinearLayout>
 
             <FrameLayout
@@ -119,21 +88,38 @@
             app:strokeColor="?attr/colorOutlineVariant"
             app:strokeWidth="1dp">
 
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/space_20">
+                android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Faint payments glyph, top-right (Stitch hero accent) -->
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:layout_marginEnd="@dimen/space_16"
+                    android:alpha="0.12"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_payments"
+                    app:tint="@color/md_on_primary_container" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:alpha="0.7"
-                    android:letterSpacing="0.08"
-                    android:text="@string/home_earned_this_month"
-                    android:textAllCaps="true"
-                    android:textAppearance="?attr/textAppearanceLabelMedium"
-                    android:textColor="@color/md_on_primary_container" />
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_20">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.7"
+                        android:letterSpacing="0.08"
+                        android:text="@string/home_earned_this_month"
+                        android:textAllCaps="true"
+                        android:textAppearance="?attr/textAppearanceLabelMedium"
+                        android:textColor="@color/md_on_primary_container"
+                        android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/monthlyEarningsText"
@@ -142,7 +128,7 @@
                     android:layout_marginTop="@dimen/space_8"
                     android:fontFeatureSettings="tnum"
                     android:textAppearance="?attr/textAppearanceDisplaySmall"
-                    android:textColor="@color/md_secondary"
+                    android:textColor="?attr/colorOnSecondaryContainer"
                     android:textStyle="bold"
                     tools:text="PLN 2944" />
 
@@ -194,7 +180,8 @@
                         android:textAppearance="?attr/textAppearanceBodyMedium"
                         android:textColor="@color/md_on_primary_container" />
                 </LinearLayout>
-            </LinearLayout>
+                </LinearLayout>
+            </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Log today's hours -->
@@ -206,6 +193,8 @@
             android:backgroundTint="@color/md_secondary_container"
             android:text="@string/home_log_today"
             android:textColor="?attr/colorOnSecondaryContainer"
+            android:textStyle="bold"
+            android:textSize="16sp"
             app:cornerRadius="@dimen/radius_small"
             app:icon="@drawable/ic_more_time"
             app:iconGravity="textStart"
@@ -265,7 +254,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:fontFeatureSettings="tnum"
                         android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textColor="@color/md_secondary"
+                        android:textColor="?attr/colorOnSecondaryContainer"
                         android:textStyle="bold"
                         tools:text="PLN 920" />
                 </LinearLayout>
@@ -317,7 +306,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:fontFeatureSettings="tnum"
                         android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textColor="@color/md_secondary"
+                        android:textColor="?attr/colorOnSecondaryContainer"
                         android:textStyle="bold"
                         tools:text="PLN 4 820" />
                 </LinearLayout>
@@ -354,51 +343,25 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_12"
+                    android:layout_marginTop="@dimen/space_8"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/nextWorkDayDateText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/nextWorkDayDateText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textStyle="bold"
-                            tools:text="25.07.2025" />
-
-                        <TextView
-                            android:id="@+id/nextWorkDayInText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_4"
-                            android:textAppearance="?attr/textAppearanceBodyMedium"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            tools:text="In 3 days" />
-
-                        <TextView
-                            android:id="@+id/nextShiftTimeText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_4"
-                            android:fontFeatureSettings="tnum"
-                            android:textAppearance="?attr/textAppearanceBodyMedium"
-                            android:textColor="@color/md_secondary"
-                            android:textStyle="bold"
-                            android:visibility="gone"
-                            tools:text="08:00 – 16:00 · 8h"
-                            tools:visibility="visible" />
-                    </LinearLayout>
+                        android:textAppearance="?attr/textAppearanceHeadlineMedium"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textStyle="bold"
+                        tools:text="Thu 20 Jun" />
 
                     <LinearLayout
+                        android:id="@+id/nextShiftChip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_12"
                         android:background="@drawable/bg_pill"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
@@ -410,15 +373,16 @@
                             android:layout_height="16dp"
                             android:layout_marginEnd="@dimen/space_4"
                             android:contentDescription="@null"
-                            android:src="@drawable/ic_calendar_black_24dp"
-                            app:tint="?attr/colorOnSurfaceVariant" />
+                            android:src="@drawable/ic_calendar"
+                            app:tint="?attr/colorPrimary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/home_shift_chip"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
-                            android:textColor="?attr/colorOnSurfaceVariant" />
+                            android:textColor="?attr/colorPrimary"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

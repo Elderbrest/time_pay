@@ -79,40 +79,25 @@ class HomeFragment : Fragment() {
             .filter { it.isAfter(today) || it.isEqual(today) }
             .minOrNull()
 
+        val dateView = binding.nextWorkDayDateText
         if (nextWorkDate != null) {
-            val daysUntil = java.time.temporal.ChronoUnit.DAYS.between(today, nextWorkDate).toInt()
-
-            val inText = when (daysUntil) {
-                0 -> getString(R.string.home_workday_today)
-                1 -> getString(R.string.home_workday_tomorrow)
-                else -> getString(R.string.home_workday_in_days, daysUntil)
-            }
-
-            val formattedDate = nextWorkDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-
-            binding.nextWorkDayInText.text = inText
-            binding.nextWorkDayDateText.text = formattedDate
-
-            // Planned time window (only if both times are set on that day)
-            val dateKey = nextWorkDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-            val info = days[dateKey]
-            val start = info?.startTime
-            val end = info?.endTime
-            if (!start.isNullOrBlank() && !end.isNullOrBlank()) {
-                val hours = info.hoursWorked
-                binding.nextShiftTimeText.text = if (hours != null && hours > 0) {
-                    getString(R.string.home_shift_window_hours, start, end, formatHours(hours))
-                } else {
-                    getString(R.string.home_shift_window, start, end)
-                }
-                binding.nextShiftTimeText.visibility = View.VISIBLE
-            } else {
-                binding.nextShiftTimeText.visibility = View.GONE
-            }
+            // Planned shift: big bold date, e.g. "Thu 20 Jun" + green chip.
+            dateView.text =
+                nextWorkDate.format(DateTimeFormatter.ofPattern("EEE d MMM", java.util.Locale.ENGLISH))
+            dateView.setTextAppearance(R.style.TextAppearance_TimePay_HeadlineMedium)
+            dateView.setTextColor(
+                com.google.android.material.color.MaterialColors.getColor(dateView, com.google.android.material.R.attr.colorOnSurface)
+            )
+            dateView.setTypeface(dateView.typeface, android.graphics.Typeface.BOLD)
+            binding.nextShiftChip.visibility = View.VISIBLE
         } else {
-            binding.nextWorkDayInText.text = getString(R.string.home_no_planned_days)
-            binding.nextWorkDayDateText.text = ""
-            binding.nextShiftTimeText.visibility = View.GONE
+            // Empty: quiet, muted line — not a giant headline.
+            dateView.text = getString(R.string.home_no_planned_days)
+            dateView.setTextAppearance(R.style.TextAppearance_TimePay_BodyMedium)
+            dateView.setTextColor(
+                com.google.android.material.color.MaterialColors.getColor(dateView, com.google.android.material.R.attr.colorOnSurfaceVariant)
+            )
+            binding.nextShiftChip.visibility = View.GONE
         }
     }
 
@@ -211,16 +196,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun showUserData(user: User) {
-        // Full name
+        // Greeting name (minimal header — just greeting + name)
         val fullName = "${user.firstName} ${user.lastName}".trim()
         binding.fullNameText.text = if (fullName.isNotBlank()) fullName else getString(R.string.home_default_user)
-
-        // Company
-        binding.workplaceText.text = user.company.ifEmpty { getString(R.string.home_add_workplace) }
-
-        // Salary rate
-        val formattedRate = String.format(java.util.Locale.US, "%.2f", user.salaryRate)
-        binding.salaryRateText.text = getString(R.string.salary_rate, getString(R.string.currency_code), formattedRate)
 
         resetStats()
 
@@ -231,8 +209,6 @@ class HomeFragment : Fragment() {
     private fun showEmptyState() {
         Log.w("HomeFragment", "No user data available")
         binding.fullNameText.text = getString(R.string.home_default_user)
-        binding.workplaceText.text = getString(R.string.home_add_workplace)
-        binding.salaryRateText.text = getString(R.string.home_set_rate)
         resetStats()
     }
 
@@ -247,7 +223,6 @@ class HomeFragment : Fragment() {
         binding.monthlyEarningsText.text = zeroEarnings
         binding.monthHoursCardText.text = zeroHours
         binding.monthEarningsCardText.text = zeroEarnings
-        binding.nextShiftTimeText.visibility = View.GONE
     }
 
     private fun showImagePickerOptions() {
