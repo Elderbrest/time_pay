@@ -241,40 +241,47 @@
                 tools:text="Worked 8h · 09:00 → 18:00"
                 tools:visibility="visible" />
 
-            <!-- Daily earnings row (done only) -->
+            <!-- Daily earnings row (done only): top divider, label left, value right -->
             <LinearLayout
                 android:id="@+id/dayDetailEarningsRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_8"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/space_16"
+                android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/calendar_daily_earnings"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
-
                 <View
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_weight="1"
-                    android:layout_marginHorizontal="@dimen/space_8"
                     android:background="?attr/colorOutlineVariant" />
 
-                <TextView
-                    android:id="@+id/dayDetailEarningsValue"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFeatureSettings="tnum"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorOnSecondaryContainer"
-                    android:textStyle="bold"
-                    tools:text="160,00 zł" />
+                    android:layout_marginTop="@dimen/space_16"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/calendar_daily_earnings"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/dayDetailEarningsValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFeatureSettings="tnum"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnSecondaryContainer"
+                        android:textStyle="bold"
+                        tools:text="160,00 zł" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Planned / empty ghost line -->
