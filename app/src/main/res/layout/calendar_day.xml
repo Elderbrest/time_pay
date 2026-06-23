@@ -1,24 +1,57 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    One calendar day cell. The cell is a rounded-square that fills the grid
+    slot; the ~1.5dp padding creates the inter-cell gap. The inner background
+    view (dayCircle) carries the done fill / planned dashed ring / today fill /
+    selected ring and is sized to fill the cell so the squares render full-bleed.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/dayContainer"
-    android:orientation="vertical"
-    android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="4dp">
+    android:layout_height="48dp"
+    android:padding="1.5dp">
 
-    <TextView
-        android:id="@+id/calendarDayText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="?attr/colorOnSurface"
-        android:gravity="center" />
+    <!-- Background carrier: fills the cell, rounded-square states. -->
+    <LinearLayout
+        android:id="@+id/dayCircle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/calendarDayText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFeatureSettings="tnum"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="15sp" />
+
+        <!-- Hours label under the number on "done" days (e.g. "8h"). -->
+        <TextView
+            android:id="@+id/calendarHoursText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.8"
+            android:fontFeatureSettings="tnum"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Amber today indicator dot, pinned to the bottom-center of the cell. -->
     <View
         android:id="@+id/dotView"
-        android:layout_width="6dp"
-        android:layout_height="6dp"
-        android:layout_marginTop="2dp"
-        android:background="@drawable/dot_working"
+        android:layout_width="4dp"
+        android:layout_height="4dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/dot_today"
         android:visibility="gone" />
-</LinearLayout>
+</FrameLayout>

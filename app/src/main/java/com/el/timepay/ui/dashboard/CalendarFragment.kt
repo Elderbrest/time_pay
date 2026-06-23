@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
-import android.util.Log
 import android.view.View
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -19,32 +19,67 @@ import androidx.lifecycle.lifecycleScope
 import com.el.timepay.R
 import com.el.timepay.models.CalendarDayInfo
 import com.el.timepay.repository.CalendarDayRepository
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.el.timepay.repository.UserRepository
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.view.CalendarView
 import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.ViewContainer
-import com.kizitonwose.calendar.core.DayPosition
 import java.time.DayOfWeek
-import java.time.YearMonth
 import java.time.LocalDate
-import kotlinx.coroutines.launch
 import java.time.LocalTime
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.util.Locale
+import kotlinx.coroutines.launch
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     private var currentMonth = YearMonth.now()
     private var selectedDate: LocalDate? = null
     private val calendarRepository = CalendarDayRepository()
+    private val userRepository = UserRepository()
     private var loadedDays: Map<String, CalendarDayInfo> = emptyMap()
+    private var salaryRate: Double = 0.0
+
+    private val keyFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     private lateinit var calendarView: CalendarView
-    private lateinit var addDayButton: FloatingActionButton
-    private lateinit var completeDayButton: FloatingActionButton
-    private lateinit var removeDayButton: FloatingActionButton
-    private lateinit var notesText: TextView
-    private lateinit var commentDayButton: FloatingActionButton
+    private lateinit var dayActionButton: ExtendedFloatingActionButton
+
+    private lateinit var monthSummaryHoursText: TextView
+    private lateinit var monthSummaryEarningsText: TextView
+
+    private lateinit var dayDetailCard: MaterialCardView
+    private lateinit var dayDetailTitle: TextView
+    private lateinit var dayDetailStatusChip: TextView
+    private lateinit var dayDetailWorked: TextView
+    private lateinit var dayDetailEarningsRow: LinearLayout
+    private lateinit var dayDetailEarningsValue: TextView
+    private lateinit var dayDetailGhost: TextView
+    private lateinit var dayDetailNote: TextView
+    private lateinit var dayDetailMore: TextView
+
+    // region formatting helpers (match HomeFragment)
+
+    /** Formats hours without a trailing ".0" (8.0 -> "8", 8.5 -> "8.5"), locale-stable. */
+    private fun formatHours(hours: Double): String =
+        if (hours % 1.0 == 0.0) hours.toInt().toString()
+        else String.format(Locale.US, "%.1f", hours)
+
+    /** "PLN 920" / "PLN 920.50", locale-stable. */
+    private fun formatEarnings(earnings: Double): String {
+        val code = getString(R.string.currency_code)
+        return if (earnings % 1.0 == 0.0) "$code ${earnings.toInt()}"
+        else "$code " + String.format(Locale.US, "%.2f", earnings)
+    }
+
+    private fun dayInfoFor(date: LocalDate?): CalendarDayInfo? =
+        date?.let { loadedDays[it.format(keyFormatter)] }
+
+    // endregion
 
     private fun updateMonthText(monthText: TextView, month: YearMonth) {
         val context = monthText.context
@@ -54,34 +89,97 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         monthText.text = context.getString(R.string.month_year_format, monthName, month.year)
     }
 
-    private fun updateActionButtons(selectedDate: LocalDate?) {
-        if (selectedDate == null) {
-            addDayButton.visibility = View.GONE
-            completeDayButton.visibility = View.GONE
-            removeDayButton.visibility = View.GONE
+    private fun updateMonthSummary() {
+        val monthLabel = currentMonth.month.name
+        val hours = loadedDays.values
+            .filter { it.status == "done" }
+            .sumOf { it.hoursWorked ?: 0.0 }
+
+        monthSummaryHoursText.text = getString(
+            R.string.calendar_summary_hours,
+            monthLabel,
+            formatHours(hours)
+        )
+
+        if (salaryRate > 0.0 && hours > 0.0) {
+            monthSummaryEarningsText.text = "· " + formatEarnings(hours * salaryRate)
+            monthSummaryEarningsText.visibility = View.VISIBLE
+        } else {
+            monthSummaryEarningsText.visibility = View.GONE
+        }
+    }
+
+    private fun updateActionButton(date: LocalDate?) {
+        if (date == null) {
+            dayActionButton.visibility = View.GONE
+            return
+        }
+        dayActionButton.visibility = View.VISIBLE
+
+        when (dayInfoFor(date)?.status) {
+            "working" -> {
+                dayActionButton.text = getString(R.string.calendar_action_mark_done)
+                dayActionButton.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_done)
+            }
+            "done" -> {
+                dayActionButton.text = getString(R.string.calendar_action_edit)
+                dayActionButton.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_edit)
+            }
+            else -> {
+                dayActionButton.text = getString(R.string.calendar_action_add)
+                dayActionButton.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_add)
+            }
+        }
+    }
+
+    /** Primary action for the contextual FAB, based on the selected day's state. */
+    private fun onActionButtonClicked() {
+        val date = selectedDate
+        if (date == null) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.calendar_select_day_first),
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
-        val dateKey = selectedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        val dayInfo = loadedDays[dateKey]
-
-        when (dayInfo?.status) {
-            "working" -> {
-                addDayButton.visibility = View.GONE
-                completeDayButton.visibility = View.VISIBLE
-                removeDayButton.visibility = View.VISIBLE
-            }
-            "done" -> {
-                addDayButton.visibility = View.GONE
-                completeDayButton.visibility = View.GONE
-                removeDayButton.visibility = View.GONE
-            }
-            else -> {
-                addDayButton.visibility = View.VISIBLE
-                completeDayButton.visibility = View.GONE
-                removeDayButton.visibility = View.GONE
-            }
+        when (dayInfoFor(date)?.status) {
+            "working" -> showCompleteWorkDayDialog(date)
+            "done" -> showMoreActionsSheet(date)
+            else -> showConfirmAddWorkDayDialog(date)
         }
+    }
+
+    /** Secondary actions (edit hours / edit note / remove) reachable from the detail card. */
+    private fun showMoreActionsSheet(date: LocalDate) {
+        val isDone = dayInfoFor(date)?.status == "done"
+        val labels = mutableListOf<String>()
+        val actions = mutableListOf<() -> Unit>()
+
+        if (isDone) {
+            labels.add(getString(R.string.calendar_more_edit_hours))
+            actions.add { showCompleteWorkDayDialog(date) }
+        }
+        labels.add(getString(R.string.calendar_more_edit_note))
+        actions.add { showEditNoteDialog(date) }
+        labels.add(getString(R.string.calendar_more_remove))
+        actions.add { confirmRemoveWorkDay(date) }
+
+        AlertDialog.Builder(requireContext())
+            .setItems(labels.toTypedArray()) { _, which -> actions[which].invoke() }
+            .show()
+    }
+
+    private fun confirmRemoveWorkDay(date: LocalDate) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.calendar_remove_work_title))
+            .setMessage(getString(R.string.calendar_remove_work_message))
+            .setPositiveButton(getString(R.string.remove_button)) { _, _ ->
+                removeWorkDay(date)
+            }
+            .setNegativeButton(getString(R.string.cancel_button), null)
+            .show()
     }
 
     private fun showConfirmAddWorkDayDialog(date: LocalDate) {
@@ -191,6 +289,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         val days = calendarRepository.getCurrentMonthDates(currentMonth)
         loadedDays = days
         calendarView.notifyCalendarChanged()
+        updateMonthSummary()
         return days
     }
 
@@ -204,102 +303,125 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             "hoursWorked" to hoursWorked
         )
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             calendarRepository.updateDayInfo(
-                date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                date.format(keyFormatter),
                 updates
             )
 
             reloadCalendar()
-            updateActionButtons(date)
+            updateActionButton(date)
+            updateDayDetail(date)
             Toast.makeText(requireContext(), getString(R.string.calendar_day_marked_done), Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun saveWorkDay(date: LocalDate) {
         val info = CalendarDayInfo(status = "working")
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             calendarRepository.saveDayInfo(
-                date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                date.format(keyFormatter),
                 info
             )
 
             reloadCalendar()
-            updateActionButtons(date)
+            updateActionButton(date)
+            updateDayDetail(date)
             Toast.makeText(requireContext(), getString(R.string.calendar_day_created), Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun removeWorkDay(date: LocalDate) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             calendarRepository.deleteDayInfo(
-                date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                date.format(keyFormatter)
             )
 
             reloadCalendar()
-            updateActionButtons(date)
+            updateActionButton(date)
+            updateDayDetail(date)
 
             Toast.makeText(requireContext(), getString(R.string.calendar_day_removed), Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun updateNotes(date: LocalDate?) {
+    private fun updateDayDetail(date: LocalDate?) {
         if (date == null) {
-            notesText.visibility = View.GONE
+            dayDetailCard.visibility = View.GONE
             return
         }
+        dayDetailCard.visibility = View.VISIBLE
 
-        val dateKey = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        val dayInfo = loadedDays[dateKey]
+        val titleFormatter = DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.ENGLISH)
+        dayDetailTitle.text = date.format(titleFormatter)
 
-        if (dayInfo != null) {
-            val hasNote = !dayInfo.note.isNullOrBlank()
+        val dayInfo = dayInfoFor(date)
+        val note = dayInfo?.note
+        val hasNote = !note.isNullOrBlank()
 
-            if (dayInfo.status == "done") {
+        // Reset optional rows.
+        dayDetailWorked.visibility = View.GONE
+        dayDetailEarningsRow.visibility = View.GONE
+        dayDetailGhost.visibility = View.GONE
+        dayDetailNote.visibility = View.GONE
+        dayDetailMore.visibility = View.GONE
+        dayDetailStatusChip.visibility = View.GONE
+
+        when (dayInfo?.status) {
+            "done" -> {
+                dayDetailStatusChip.visibility = View.VISIBLE
+                dayDetailStatusChip.text = getString(R.string.calendar_status_done)
+                dayDetailStatusChip.setBackgroundResource(R.drawable.bg_chip_done)
+                dayDetailStatusChip.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.md_on_primary_container)
+                )
+
+                val hoursValue = dayInfo.hoursWorked ?: 0.0
                 val start = dayInfo.startTime ?: "-"
                 val end = dayInfo.endTime ?: "-"
-                val hours = String.format("%.1f", dayInfo.hoursWorked ?: 0.0)
-                val doneText = getString(
-                    R.string.calendar_done_text,
-                    hours,
-                    start,
-                    end
-                )
-
-                if (hasNote) {
-                    val label = getString(R.string.calendar_notes_label)
-                    val content = dayInfo.note ?: ""
-                    val spannable = SpannableString(doneText + label + content)
-                    // Label is "\n\n<word>:\n" — bold only the "<word>:" portion,
-                    // skipping the leading "\n\n" prefix and trailing "\n".
+                val hoursLabel = getString(R.string.calendar_hours_cell, formatHours(hoursValue))
+                val workedText = getString(R.string.calendar_worked_summary, hoursLabel, start, end)
+                val spannable = SpannableString(workedText)
+                val hoursStart = workedText.indexOf(hoursLabel)
+                if (hoursStart >= 0) {
                     spannable.setSpan(
                         StyleSpan(Typeface.BOLD),
-                        doneText.length + 2,
-                        doneText.length + label.length - 1,
+                        hoursStart,
+                        hoursStart + hoursLabel.length,
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
-                    notesText.text = spannable
-                } else {
-                    notesText.text = doneText
                 }
-                notesText.visibility = View.VISIBLE
-            } else if (hasNote) {
-                val label = getString(R.string.calendar_notes_label)
-                val content = dayInfo.note ?: ""
-                val spannable = SpannableString(label + content)
-                spannable.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    0,
-                    label.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                notesText.text = spannable
-                notesText.visibility = View.VISIBLE
-            } else {
-                notesText.visibility = View.GONE
+                dayDetailWorked.text = spannable
+                dayDetailWorked.visibility = View.VISIBLE
+
+                if (salaryRate > 0.0) {
+                    dayDetailEarningsValue.text = formatEarnings(hoursValue * salaryRate)
+                    dayDetailEarningsRow.visibility = View.VISIBLE
+                }
+
+                dayDetailMore.visibility = View.VISIBLE
             }
-        } else {
-            notesText.visibility = View.GONE
+            "working" -> {
+                dayDetailStatusChip.visibility = View.VISIBLE
+                dayDetailStatusChip.text = getString(R.string.calendar_status_planned)
+                dayDetailStatusChip.setBackgroundResource(R.drawable.bg_chip_planned)
+                dayDetailStatusChip.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.md_on_secondary_container)
+                )
+
+                dayDetailGhost.text = getString(R.string.calendar_planned_incomplete)
+                dayDetailGhost.visibility = View.VISIBLE
+                dayDetailMore.visibility = View.VISIBLE
+            }
+            else -> {
+                dayDetailGhost.text = getString(R.string.calendar_empty_day)
+                dayDetailGhost.visibility = View.VISIBLE
+            }
+        }
+
+        if (hasNote) {
+            dayDetailNote.text = note
+            dayDetailNote.visibility = View.VISIBLE
         }
     }
 
@@ -308,27 +430,26 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             "note" to note
         )
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             calendarRepository.updateDayInfo(
-                date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                date.format(keyFormatter),
                 updates
             )
             reloadCalendar()
-            updateNotes(date)
+            updateDayDetail(date)
             Toast.makeText(requireContext(), getString(R.string.calendar_note_saved), Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun showEditNoteDialog(date: LocalDate) {
-        val dateKey = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        val existingNote = loadedDays[dateKey]?.note ?: ""
+        val existingNote = dayInfoFor(date)?.note ?: ""
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_edit_note, null)
         val noteEditText = dialogView.findViewById<EditText>(R.id.noteEditText)
         noteEditText.setText(existingNote)
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Заметка")
+            .setTitle(getString(R.string.calendar_note_title))
             .setView(dialogView)
             .setPositiveButton(getString(R.string.save_button)) { _, _ ->
                 val newNote = noteEditText.text.toString().trim()
@@ -338,7 +459,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             .show()
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -347,11 +467,20 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         val monthTitle = view.findViewById<TextView>(R.id.monthText)
 
         calendarView = view.findViewById(R.id.calendarView)
-        addDayButton = view.findViewById(R.id.addDayButton)
-        completeDayButton = view.findViewById(R.id.completeDayButton)
-        removeDayButton = view.findViewById(R.id.removeDayButton)
-        commentDayButton = view.findViewById(R.id.editNoteButton)
-        notesText = view.findViewById(R.id.notesText)
+        dayActionButton = view.findViewById(R.id.dayActionButton)
+
+        monthSummaryHoursText = view.findViewById(R.id.monthSummaryHoursText)
+        monthSummaryEarningsText = view.findViewById(R.id.monthSummaryEarningsText)
+
+        dayDetailCard = view.findViewById(R.id.dayDetailCard)
+        dayDetailTitle = view.findViewById(R.id.dayDetailTitle)
+        dayDetailStatusChip = view.findViewById(R.id.dayDetailStatusChip)
+        dayDetailWorked = view.findViewById(R.id.dayDetailWorked)
+        dayDetailEarningsRow = view.findViewById(R.id.dayDetailEarningsRow)
+        dayDetailEarningsValue = view.findViewById(R.id.dayDetailEarningsValue)
+        dayDetailGhost = view.findViewById(R.id.dayDetailGhost)
+        dayDetailNote = view.findViewById(R.id.dayDetailNote)
+        dayDetailMore = view.findViewById(R.id.dayDetailMore)
 
         calendarView.setup(
             startMonth = currentMonth.minusMonths(10),
@@ -362,78 +491,111 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         updateMonthText(monthTitle, currentMonth)
 
         selectedDate = LocalDate.now()
-        updateActionButtons(selectedDate)
+        updateActionButton(selectedDate)
+
+        // Fetch the salary rate so the month summary + daily earnings can be shown.
+        viewLifecycleOwner.lifecycleScope.launch {
+            salaryRate = userRepository.getCurrentUserOnce()?.salaryRate ?: 0.0
+            updateMonthSummary()
+            updateDayDetail(selectedDate)
+        }
 
         calendarView.notifyCalendarChanged()
 
         class DayViewContainer(view: View) : ViewContainer(view) {
             lateinit var day: CalendarDay
+            val container: View = view.findViewById(R.id.dayCircle)
             val textView: TextView = view.findViewById(R.id.calendarDayText)
+            val hoursView: TextView = view.findViewById(R.id.calendarHoursText)
+            val dotView: View = view.findViewById(R.id.dotView)
 
             init {
                 view.setOnClickListener {
                     if (day.position == DayPosition.MonthDate) {
                         selectedDate = day.date
                         calendarView.notifyCalendarChanged()
-                        updateActionButtons(selectedDate)
-                        updateNotes(selectedDate)
+                        updateActionButton(selectedDate)
+                        updateDayDetail(selectedDate)
                     }
                 }
-
             }
         }
 
         calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view)
 
-            fun updateDayView(container: DayViewContainer, day: CalendarDay) {
-                val dateKey = day.date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                val dayInfo = loadedDays[dateKey]
-
-                if (dayInfo != null && day.position == DayPosition.MonthDate) {
-                    val dotDrawable = when (dayInfo.status) {
-                        "working" -> ContextCompat.getDrawable(requireContext(), R.drawable.dot_working)
-                        "done" -> ContextCompat.getDrawable(requireContext(), R.drawable.dot_done)
-                        else -> null
-                    }
-
-                    container.textView.setCompoundDrawablesWithIntrinsicBounds(
-                        null, null, null, dotDrawable
-                    )
-                } else {
-                    container.textView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
-                }
-            }
-
             override fun bind(container: DayViewContainer, day: CalendarDay) {
-                container.textView.text = day.date.dayOfMonth.toString()
                 container.day = day
+                container.textView.text = day.date.dayOfMonth.toString()
+                container.hoursView.visibility = View.GONE
+                container.dotView.visibility = View.GONE
+                container.container.background = null
+                container.textView.alpha = 1f
+                container.textView.setTypeface(null, Typeface.NORMAL)
 
-                when {
-                    day.date == selectedDate -> {
-                        container.textView.setTextColor(resources.getColor(R.color.black, null))
-                        container.textView.setTypeface(null,
-                            if (day.date == LocalDate.now()) android.graphics.Typeface.BOLD
-                            else android.graphics.Typeface.NORMAL
+                val today = LocalDate.now()
+                val isToday = day.date == today
+                val isSelected = day.date == selectedDate
+                val dayInfo = if (day.position == DayPosition.MonthDate) {
+                    loadedDays[day.date.format(keyFormatter)]
+                } else {
+                    null
+                }
+
+                if (day.position != DayPosition.MonthDate) {
+                    // Out-of-month days: faded plain number.
+                    container.textView.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.calendar_day_inactive)
+                    )
+                    container.textView.alpha = 0.38f
+                    return
+                }
+
+                when (dayInfo?.status) {
+                    "done" -> {
+                        container.container.setBackgroundResource(R.drawable.bg_day_done)
+                        container.textView.setTextColor(
+                            ContextCompat.getColor(requireContext(), R.color.white)
                         )
-                        container.view.setBackgroundResource(R.drawable.bg_selected_day)
+                        container.textView.setTypeface(null, Typeface.BOLD)
+                        val hours = dayInfo.hoursWorked ?: 0.0
+                        if (hours > 0.0) {
+                            container.hoursView.text =
+                                getString(R.string.calendar_hours_cell, formatHours(hours))
+                            container.hoursView.visibility = View.VISIBLE
+                        }
                     }
-                    day.date == LocalDate.now() -> {
-                        container.textView.setTextColor(resources.getColor(R.color.black, null))
-                        container.textView.setTypeface(null, android.graphics.Typeface.BOLD)
-                        container.view.background = null
-                    }
-                    day.position == DayPosition.MonthDate -> {
-                        container.textView.setTextColor(resources.getColor(R.color.calendar_day_active, null))
-                        container.view.background = null
+                    "working" -> {
+                        container.container.setBackgroundResource(R.drawable.bg_day_planned)
+                        container.textView.setTextColor(
+                            ContextCompat.getColor(requireContext(), R.color.md_secondary)
+                        )
                     }
                     else -> {
-                        container.textView.setTextColor(resources.getColor(R.color.calendar_day_inactive, null))
-                        container.view.background = null
+                        if (isToday) {
+                            container.container.setBackgroundResource(R.drawable.bg_day_today)
+                        }
+                        container.textView.setTextColor(
+                            ContextCompat.getColor(requireContext(), R.color.calendar_day_active)
+                        )
                     }
                 }
 
-                updateDayView(container, day)
+                // Selected ring takes visual priority over the today fill (but not over
+                // the done/planned fills, which carry status meaning).
+                if (isSelected && dayInfo?.status != "done") {
+                    container.container.setBackgroundResource(R.drawable.bg_selected_day)
+                    if (dayInfo?.status == "working") {
+                        container.textView.setTextColor(
+                            ContextCompat.getColor(requireContext(), R.color.md_secondary)
+                        )
+                    }
+                }
+
+                if (isToday) {
+                    container.textView.setTypeface(null, Typeface.BOLD)
+                    container.dotView.visibility = View.VISIBLE
+                }
             }
         }
 
@@ -441,12 +603,19 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             currentMonth = it.yearMonth
             updateMonthText(monthTitle, currentMonth)
 
-            lifecycleScope.launch {
+            // Drop a selection that belongs to a now off-screen month so the FAB and
+            // detail card can't act on a day the user can no longer see.
+            if (selectedDate?.let { date -> YearMonth.from(date) != currentMonth } == true) {
+                selectedDate = null
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
                 val days = calendarRepository.getCurrentMonthDates(currentMonth)
                 loadedDays = days
                 calendarView.notifyCalendarChanged()
-                updateActionButtons(selectedDate)
-                updateNotes(selectedDate)
+                updateMonthSummary()
+                updateActionButton(selectedDate)
+                updateDayDetail(selectedDate)
             }
         }
 
@@ -462,38 +631,10 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             updateMonthText(monthTitle, currentMonth)
         }
 
-        addDayButton.setOnClickListener {
-            val date = selectedDate
-            if (date != null) {
-                showConfirmAddWorkDayDialog(date)
-            } else {
-                Toast.makeText(requireContext(), getString(R.string.calendar_select_day_first), Toast.LENGTH_SHORT).show()
-            }
-        }
+        dayActionButton.setOnClickListener { onActionButtonClicked() }
 
-        completeDayButton.setOnClickListener {
-            selectedDate?.let { date ->
-                showCompleteWorkDayDialog(date)
-            }
-        }
-
-        commentDayButton.setOnClickListener {
-            selectedDate?.let { date ->
-                showEditNoteDialog(date)
-            }
-        }
-
-        removeDayButton.setOnClickListener {
-            selectedDate?.let { date ->
-                AlertDialog.Builder(requireContext())
-                    .setTitle(getString(R.string.calendar_remove_work_title))
-                    .setMessage(getString(R.string.calendar_remove_work_message))
-                    .setPositiveButton(getString(R.string.remove_button)) { _, _ ->
-                        removeWorkDay(date)
-                    }
-                    .setNegativeButton(getString(R.string.cancel_button), null)
-                    .show()
-            }
+        dayDetailMore.setOnClickListener {
+            selectedDate?.let { date -> showMoreActionsSheet(date) }
         }
     }
 }
