@@ -74,6 +74,21 @@
     <string name="calendar_action_add">Add day</string>
     <string name="calendar_action_mark_done">Mark done</string>
     <string name="calendar_action_edit">Edit</string>
+    <string name="calendar_action_log">Log hours</string>
+    <string name="log_sheet_intent_log">Log hours</string>
+    <string name="log_sheet_intent_plan">Plan day</string>
+    <string name="log_sheet_start">Start %1$s</string>
+    <string name="log_sheet_end">End %1$s</string>
+    <string name="log_sheet_log_button">Log %1$sh</string>
+    <string name="log_sheet_plan_button">Plan this day</string>
+    <string name="log_sheet_save_button">Save changes</string>
+    <string name="log_sheet_remove">Remove this day</string>
+    <string name="log_sheet_remove_confirm">Tap again to remove</string>
+    <string name="log_sheet_no_rate">Set your rate in Settings to see earnings</string>
+    <string name="log_sheet_save_failed">Couldn\'t save — please try again</string>
+    <string name="log_sheet_plan_caption">Marks this day as planned — no hours yet</string>
+    <string name="log_sheet_earnings_preview">= %1$s</string>
+    <string name="log_sheet_edit_note">Edit note</string>
     <string name="calendar_more">More</string>
     <string name="calendar_more_edit_hours">Edit hours</string>
     <string name="calendar_more_edit_note">Edit note</string>

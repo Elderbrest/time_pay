@@ -19,6 +19,7 @@ import com.el.timepay.databinding.FragmentHomeBinding
 import com.el.timepay.repository.PhotoRepository
 import com.el.timepay.repository.UserRepository
 import com.el.timepay.repository.CalendarDayRepository
+import com.el.timepay.ui.shared.LogHoursBottomSheet
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import android.util.Log
@@ -34,6 +35,9 @@ class HomeFragment : Fragment() {
     private val userRepository = UserRepository()
     private val photoRepository = PhotoRepository()
     private val calendarRepository = CalendarDayRepository()
+
+    private var loadedDays: Map<String, CalendarDayInfo> = emptyMap()
+    private var salaryRate: Double = 0.0
 
     private val imagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -65,8 +69,41 @@ class HomeFragment : Fragment() {
         }
 
         binding.logTodayButton.setOnClickListener {
-            Toast.makeText(context, R.string.coming_soon, Toast.LENGTH_SHORT).show()
+            openLogSheet(LocalDate.now())
         }
+
+        // Refresh stats after the shared log/plan sheet writes a day.
+        childFragmentManager.setFragmentResultListener(
+            LogHoursBottomSheet.DEFAULT_REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, _ -> loadUserData() }
+    }
+
+    /** Most recent "done" day's start/end, used to pre-fill the sheet's time pickers. */
+    private fun lastShift(): Pair<String?, String?> {
+        val last = loadedDays.entries
+            .filter { it.value.status == "done" && it.value.startTime != null && it.value.endTime != null }
+            .maxByOrNull { it.key }
+            ?.value
+        return last?.startTime to last?.endTime
+    }
+
+    private fun openLogSheet(date: LocalDate) {
+        val key = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val info = loadedDays[key]
+        val (lastStart, lastEnd) = lastShift()
+        LogHoursBottomSheet.newInstance(
+            targetDate = date,
+            existingStatus = info?.status,
+            existingStartTime = info?.startTime,
+            existingEndTime = info?.endTime,
+            existingHours = info?.hoursWorked,
+            existingNote = info?.note,
+            salaryRate = salaryRate,
+            lastShiftStart = lastStart,
+            lastShiftEnd = lastEnd,
+            requestKey = LogHoursBottomSheet.DEFAULT_REQUEST_KEY
+        ).show(childFragmentManager, "log_hours")
     }
 
     private fun updateNextWorkDayCard(days: Map<String, CalendarDayInfo>) {
@@ -167,6 +204,10 @@ class HomeFragment : Fragment() {
                 val user = userRepository.getCurrentUserOnce()
                 val currentMonth = YearMonth.now()
                 val days = calendarRepository.getCurrentMonthDates(currentMonth)
+
+                // Cache for the shared log sheet (today's info + last-shift pre-fill).
+                loadedDays = days
+                salaryRate = user?.salaryRate ?: 0.0
 
                 // If the current week (Mon..Sun) spans into the previous month,
                 // fetch the previous month's data as well so weekly stats don't undercount.

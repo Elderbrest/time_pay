@@ -309,27 +309,6 @@
                 android:visibility="gone"
                 tools:text="Covered the late shift."
                 tools:visibility="visible" />
-
-            <!-- More actions (edit note / remove) -->
-            <TextView
-                android:id="@+id/dayDetailMore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginTop="@dimen/space_8"
-                android:background="?attr/selectableItemBackground"
-                android:drawablePadding="@dimen/space_4"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="@dimen/space_8"
-                android:paddingVertical="@dimen/space_4"
-                android:text="@string/calendar_more"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
-                android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"
-                android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_more_horiz"
-                app:drawableTint="?attr/colorPrimary"
-                tools:visibility="visible" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
