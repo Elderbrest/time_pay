@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.TimePicker
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
@@ -19,8 +21,6 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
@@ -105,10 +105,14 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
         )
         renderStatusChip()
 
-        // Toggle. Default selection is always "Log hours".
+        // Toggle. Default selection is always "Log hours". When the caller disallows
+        // planning (e.g. Home's "Log today's hours"), hide it and force Log mode.
         btnLog.setOnClickListener { applyMode(logMode = true) }
         btnPlan.setOnClickListener { applyMode(logMode = false) }
         intentToggle.check(R.id.sheetBtnLog)
+        if (!args.getBoolean(ARG_ALLOW_PLAN, true)) {
+            intentToggle.visibility = View.GONE
+        }
 
         // Time pickers.
         startBtn.setOnClickListener { pickTime(isStart = true) }
@@ -198,23 +202,32 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
         updatePrimaryLabel()
     }
 
+    /** Scrolling-wheel (spinner) time picker in a small green-themed dialog. */
     private fun pickTime(isStart: Boolean) {
         val initial = if (isStart) startT else endT
-        val picker = MaterialTimePicker.Builder()
-            .setTimeFormat(TimeFormat.CLOCK_24H)
-            .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-            .setHour(initial.hour)
-            .setMinute(initial.minute)
-            .build()
-        picker.addOnPositiveButtonClickListener {
-            val picked = LocalTime.of(picker.hour, picker.minute)
-            if (isStart) startT = picked else endT = picked
-            recomputeHours()
-            updateTimeButtons()
-            updateEarningsPreview()
-            updatePrimaryLabel()
-        }
-        picker.show(childFragmentManager, "time_picker")
+        val dialogView = layoutInflater.inflate(R.layout.dialog_time_picker, null)
+        val timePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
+        timePicker.setIs24HourView(true)
+        timePicker.hour = initial.hour
+        timePicker.minute = initial.minute
+
+        val title = getString(
+            if (isStart) R.string.calendar_time_start else R.string.calendar_time_end
+        )
+
+        AlertDialog.Builder(requireContext(), R.style.ThemeOverlay_TimePay_SpinnerDialog)
+            .setTitle(title)
+            .setView(dialogView)
+            .setPositiveButton(R.string.save_button) { _, _ ->
+                val picked = LocalTime.of(timePicker.hour, timePicker.minute)
+                if (isStart) startT = picked else endT = picked
+                recomputeHours()
+                updateTimeButtons()
+                updateEarningsPreview()
+                updatePrimaryLabel()
+            }
+            .setNegativeButton(R.string.cancel_button, null)
+            .show()
     }
 
     private fun updateTimeButtons() {
@@ -407,6 +420,7 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
         private const val ARG_LAST_START = "arg_last_start"
         private const val ARG_LAST_END = "arg_last_end"
         private const val ARG_REQUEST_KEY = "arg_request_key"
+        private const val ARG_ALLOW_PLAN = "arg_allow_plan"
 
         private const val REMOVE_CONFIRM_WINDOW_MS = 3000L
 
@@ -420,7 +434,8 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
             salaryRate: Double,
             lastShiftStart: String?,
             lastShiftEnd: String?,
-            requestKey: String
+            requestKey: String,
+            allowPlan: Boolean = true
         ): LogHoursBottomSheet = LogHoursBottomSheet().apply {
             arguments = bundleOf(
                 ARG_DATE to targetDate.toEpochDay(),
@@ -432,7 +447,8 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
                 ARG_RATE to salaryRate,
                 ARG_LAST_START to lastShiftStart,
                 ARG_LAST_END to lastShiftEnd,
-                ARG_REQUEST_KEY to requestKey
+                ARG_REQUEST_KEY to requestKey,
+                ARG_ALLOW_PLAN to allowPlan
             )
         }
     }

@@ -102,7 +102,8 @@ class HomeFragment : Fragment() {
             salaryRate = salaryRate,
             lastShiftStart = lastStart,
             lastShiftEnd = lastEnd,
-            requestKey = LogHoursBottomSheet.DEFAULT_REQUEST_KEY
+            requestKey = LogHoursBottomSheet.DEFAULT_REQUEST_KEY,
+            allowPlan = false
         ).show(childFragmentManager, "log_hours")
     }
 
