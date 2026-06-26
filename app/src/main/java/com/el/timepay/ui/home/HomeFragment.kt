@@ -230,6 +230,9 @@ class HomeFragment : Fragment() {
                 } else {
                     showEmptyState()
                 }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                // Normal when navigating away mid-load; not an error — let it propagate.
+                throw e
             } catch (e: Exception) {
                 Log.e("HomeFragment", "Error loading user data", e)
                 Toast.makeText(context, "Error loading user data: ${e.message}", Toast.LENGTH_SHORT).show()

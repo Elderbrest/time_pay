@@ -118,6 +118,17 @@
     <!-- Reports tab — coming-soon placeholder. -->
     <string name="reports_coming_soon_title">Coming soon</string>
     <string name="reports_coming_soon_body">Charts of your hours and earnings are on the way.</string>
+
+    <!-- Reports tab — month chart + summary. -->
+    <string name="reports_stat_total_hours">Total hours</string>
+    <string name="reports_stat_total_earned">Total earned</string>
+    <string name="reports_stat_days_worked">Days worked</string>
+    <string name="reports_stat_avg_per_day">Avg / day</string>
+    <string name="reports_no_hours_logged">No hours logged</string>
+    <string name="reports_empty_month">No hours logged in %1$s</string>
+    <string name="reports_set_rate_hint">Set your hourly rate to see earnings</string>
+    <string name="reports_prev_month">Previous month</string>
+    <string name="reports_next_month">Next month</string>
     <string name="salary_rate">%1$s %2$s/h</string>
     <string name="currency_code">PLN</string>
     <string name="month_year_format">%1$s %2$d</string>
