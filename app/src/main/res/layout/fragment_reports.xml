@@ -108,16 +108,6 @@
             tools:text="No hours logged in June"
             tools:visibility="visible" />
 
-        <!-- Animated daily bar chart -->
-        <com.el.timepay.ui.widget.HoursBarChartView
-            android:id="@+id/chart"
-            android:layout_width="0dp"
-            android:layout_height="200dp"
-            android:layout_marginTop="@dimen/space_20"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/emptyStateText" />
-
         <!-- Summary stats card: 2x2 tiles -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/statsCard"
@@ -129,7 +119,7 @@
             app:cardElevation="@dimen/elevation_card_soft"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chart"
+            app:layout_constraintTop_toBottomOf="@id/emptyStateText"
             app:strokeColor="?attr/colorOutlineVariant"
             app:strokeWidth="1dp">
 
@@ -278,6 +268,52 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Work Activity chart card: titled header + animated daily bar chart -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/activityCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_20"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+            app:cardCornerRadius="@dimen/radius_card"
+            app:cardElevation="@dimen/elevation_card_soft"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/statsCard"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_16">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reports_activity_title"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_4"
+                    android:text="@string/reports_activity_subtitle"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <!-- Animated daily bar chart (only worked days are drawn/clickable) -->
+                <com.el.timepay.ui.widget.HoursBarChartView
+                    android:id="@+id/chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="@dimen/space_16" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Selected-day detail card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/dayDetailCard"
@@ -290,7 +326,7 @@
             app:cardElevation="@dimen/elevation_card_soft"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/statsCard"
+            app:layout_constraintTop_toBottomOf="@id/activityCard"
             app:strokeColor="?attr/colorOutlineVariant"
             app:strokeWidth="1dp"
             tools:visibility="visible">

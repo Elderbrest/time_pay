@@ -53,10 +53,6 @@ class HoursBarChartView @JvmOverloads constructor(
         style = Paint.Style.FILL
         color = ContextCompat.getColor(context, R.color.md_secondary)
     }
-    private val barEmptyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-        color = ContextCompat.getColor(context, R.color.md_outline_variant)
-    }
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = 1f
@@ -170,11 +166,8 @@ class HoursBarChartView @JvmOverloads constructor(
             val left = centerX - barWidth / 2f
             val right = centerX + barWidth / 2f
 
-            if (datum.hours <= 0.0) {
-                // Hairline stub at the baseline for zero / non-done days.
-                rect.set(left, baselineY - dp(1f), right, baselineY)
-                canvas.drawRect(rect, barEmptyPaint)
-            } else {
+            // Only worked days get a bar; days off leave an empty slot (no stub).
+            if (datum.hours > 0.0) {
                 val fraction = (datum.hours / maxHours).coerceIn(0.0, 1.0).toFloat()
                 val barHeight = fraction * chartHeight * animProgress
                 val top = baselineY - barHeight
@@ -240,7 +233,8 @@ class HoursBarChartView @JvmOverloads constructor(
         }
         val slot = (chartRight - chartLeft) / count
         val index = ((x - chartLeft) / slot).toInt()
-        if (index in data.indices) {
+        // Only worked days have a bar to select; a tap on a day-off slot clears.
+        if (index in data.indices && data[index].hours > 0.0) {
             selectedIndex = if (index == selectedIndex) null else index
             invalidate()
             onBarSelected?.invoke(selectedIndex?.let { data[it].day })

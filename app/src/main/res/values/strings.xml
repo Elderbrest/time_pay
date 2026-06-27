@@ -129,6 +129,9 @@
     <string name="reports_set_rate_hint">Set your hourly rate to see earnings</string>
     <string name="reports_prev_month">Previous month</string>
     <string name="reports_next_month">Next month</string>
+    <string name="reports_activity_title">Work Activity</string>
+    <string name="reports_activity_subtitle">Daily hours distribution</string>
+    <string name="reports_logged_day_title">Logged Day</string>
     <string name="salary_rate">%1$s %2$s/h</string>
     <string name="currency_code">PLN</string>
     <string name="month_year_format">%1$s %2$d</string>
