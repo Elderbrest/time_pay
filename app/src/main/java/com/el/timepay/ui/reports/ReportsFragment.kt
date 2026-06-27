@@ -1,5 +1,6 @@
 package com.el.timepay.ui.reports
 
+import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.SpannableString
@@ -8,6 +9,8 @@ import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.el.timepay.R
@@ -16,11 +19,16 @@ import com.el.timepay.models.CalendarDayInfo
 import com.el.timepay.repository.CalendarDayRepository
 import com.el.timepay.repository.UserRepository
 import com.el.timepay.ui.widget.BarDatum
+import com.el.timepay.util.MonthlyReportPdf
+import java.io.File
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Reports tab: a month picker drives an animated daily bar chart, a summary stats
@@ -91,6 +99,8 @@ class ReportsFragment : Fragment() {
         }
 
         binding.chart.onBarSelected = { day -> showDayDetail(day) }
+
+        binding.exportPdfButton.setOnClickListener { exportPdf() }
 
         viewLifecycleOwner.lifecycleScope.launch {
             salaryRate = userRepository.getCurrentUserOnce()?.salaryRate ?: 0.0
@@ -221,6 +231,70 @@ class ReportsFragment : Fragment() {
             binding.dayDetailGhost.text = getString(R.string.reports_no_hours_logged)
             binding.dayDetailGhost.visibility = View.VISIBLE
         }
+    }
+
+    private fun exportPdf() {
+        val monthLabel = currentMonth.month.name
+            .lowercase()
+            .replaceFirstChar { it.uppercase() }
+
+        val hasDoneDays = loadedDays.values.any { it.status == "done" }
+        if (!hasDoneDays) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.reports_export_empty, monthLabel),
+                Toast.LENGTH_SHORT,
+            ).show()
+            return
+        }
+
+        binding.exportPdfButton.isEnabled = false
+        val month = currentMonth
+        val days = loadedDays
+        val rate = salaryRate
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val file = withContext(Dispatchers.IO) {
+                    MonthlyReportPdf.build(
+                        requireContext(),
+                        month,
+                        days,
+                        rate,
+                        getString(R.string.currency_code),
+                    )
+                }
+                if (_binding == null) return@launch
+                sharePdf(file)
+                binding.exportPdfButton.isEnabled = true
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (_binding == null) return@launch
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.reports_export_failed),
+                    Toast.LENGTH_SHORT,
+                ).show()
+                binding.exportPdfButton.isEnabled = true
+            }
+        }
+    }
+
+    private fun sharePdf(file: File) {
+        val uri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.fileprovider",
+            file,
+        )
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "application/pdf"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(
+            Intent.createChooser(intent, getString(R.string.reports_export_share_title)),
+        )
     }
 
     override fun onDestroyView() {

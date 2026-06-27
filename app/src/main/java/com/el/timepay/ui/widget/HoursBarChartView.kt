@@ -53,6 +53,10 @@ class HoursBarChartView @JvmOverloads constructor(
         style = Paint.Style.FILL
         color = ContextCompat.getColor(context, R.color.md_secondary)
     }
+    private val barEmptyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = ContextCompat.getColor(context, R.color.md_surface_container_high)
+    }
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = 1f
@@ -166,7 +170,8 @@ class HoursBarChartView @JvmOverloads constructor(
             val left = centerX - barWidth / 2f
             val right = centerX + barWidth / 2f
 
-            // Only worked days get a bar; days off leave an empty slot (no stub).
+            // Every day gets a bar: worked days scale with hours; days off get a
+            // short grey placeholder so the row keeps a steady rhythm.
             if (datum.hours > 0.0) {
                 val fraction = (datum.hours / maxHours).coerceIn(0.0, 1.0).toFloat()
                 val barHeight = fraction * chartHeight * animProgress
@@ -179,6 +184,11 @@ class HoursBarChartView @JvmOverloads constructor(
                 if (i == selectedIndex) {
                     drawValueChip(canvas, datum.hours, centerX, top)
                 }
+            } else {
+                val barHeight = (chartHeight * 0.10f * animProgress).coerceAtLeast(dp(6f))
+                val top = baselineY - barHeight
+                rect.set(left, top, right, baselineY + radius)
+                canvas.drawRoundRect(rect, radius, radius, barEmptyPaint)
             }
 
             if (i in labelIndices) {
