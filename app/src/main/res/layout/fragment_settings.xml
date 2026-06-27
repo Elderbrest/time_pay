@@ -14,8 +14,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/screen_padding_horizontal"
-        android:paddingTop="@dimen/space_48"
-        android:paddingBottom="96dp">
+        android:paddingTop="@dimen/space_32"
+        android:paddingBottom="@dimen/space_24">
 
         <!-- Profile header: avatar + camera badge, name, email -->
         <FrameLayout
@@ -92,7 +92,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_32"
+            android:layout_marginTop="@dimen/space_24"
             android:layout_marginBottom="@dimen/space_8"
             android:text="@string/settings_section_profile"
             android:textAllCaps="true"
