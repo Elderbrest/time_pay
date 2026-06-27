@@ -1,19 +1,27 @@
 package com.el.timepay.ui.settings
 
+import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.el.timepay.LoginActivity
 import com.el.timepay.R
 import com.el.timepay.databinding.FragmentSettingsBinding
-import com.google.firebase.auth.FirebaseAuth
+import com.el.timepay.models.User
+import com.el.timepay.repository.PhotoRepository
 import com.el.timepay.repository.UserRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,6 +33,18 @@ class SettingsFragment : Fragment() {
     private val binding get() = _binding!!
     private val auth = FirebaseAuth.getInstance()
     private val userRepository = UserRepository()
+    private val photoRepository = PhotoRepository()
+
+    /** True once a profile photo has loaded, so initials don't paint over it. */
+    private var hasPhoto = false
+
+    private val imagePickerLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri -> uploadProfilePhoto(uri) }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,64 +58,64 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        try {
-            // Load current user data
-            loadUserData()
-    
-            // Save button logic
-            binding.saveSettingsButton.setOnClickListener {
-                saveUserData()
-            }
-    
-            binding.logoutButton.setOnClickListener {
-                showLogoutConfirmationDialog()
-            }
-        } catch (e: Exception) {
-            android.util.Log.e("SettingsFragment", "Error setting up fragment", e)
-            Toast.makeText(context, "Error setting up settings: ${e.message}", Toast.LENGTH_SHORT).show()
-            resetUI()
-        }
+        binding.versionText.text = getString(R.string.settings_version, appVersionName())
+        loadProfileImageForCurrentUser()
+        loadUserData()
+
+        binding.changePhotoButton.setOnClickListener { showPhotoOptions() }
+        binding.profileImage.setOnClickListener { showPhotoOptions() }
+        binding.saveSettingsButton.setOnClickListener { saveUserData() }
+        binding.logoutButton.setOnClickListener { showLogoutConfirmationDialog() }
     }
-    
+
     private fun loadUserData() {
-        // Show loading state
         setUiLoading(true)
-        
+
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val user = withTimeoutOrNull(5000) {
-                    userRepository.getCurrentUserOnce()
-                }
-                
+                val user = withTimeoutOrNull(5000) { userRepository.getCurrentUserOnce() }
+                if (_binding == null) return@launch
+
                 if (user != null) {
-                    // Load first name and last name
-                    binding.firstNameInput.setText(user.firstName)
-                    binding.lastNameInput.setText(user.lastName)
-                    
-                    // Load company
-                    binding.companyInput.setText(user.company)
-                    
-                    // Load salary rate
-                    if (user.salaryRate > 0) {
-                        binding.salaryRateInput.setText("%.2f".format(user.salaryRate))                    } else {
-                        binding.salaryRateInput.setText("")
-                    }
+                    bindUser(user)
                 } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Couldn't load your profile data", Toast.LENGTH_SHORT).show()
-                    }
+                    Toast.makeText(context, "Couldn't load your profile data", Toast.LENGTH_SHORT).show()
                 }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 android.util.Log.e("SettingsFragment", "Error loading user data", e)
-                withContext(Dispatchers.Main) {
+                if (_binding != null) {
                     Toast.makeText(context, "Error loading data: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             } finally {
-                setUiLoading(false)
+                if (_binding != null) setUiLoading(false)
             }
         }
     }
-    
+
+    private fun bindUser(user: User) {
+        binding.firstNameInput.setText(user.firstName)
+        binding.lastNameInput.setText(user.lastName)
+        binding.companyInput.setText(user.company)
+
+        if (user.salaryRate > 0) {
+            // Locale.US so the value always uses a dot — the parse on save is dot-only.
+            binding.salaryRateInput.setText(String.format(java.util.Locale.US, "%.2f", user.salaryRate))
+        } else {
+            binding.salaryRateInput.setText("")
+        }
+
+        val fullName = "${user.firstName} ${user.lastName}".trim()
+        binding.profileNameText.text =
+            if (fullName.isNotBlank()) fullName else getString(R.string.settings_default_name)
+        binding.profileEmailText.text = user.email
+
+        // Show initials immediately unless a photo has already loaded (avoids painting
+        // initials over a loaded photo when the user fetch resolves after the image).
+        if (!hasPhoto) showInitialsPlaceholder(user)
+    }
+
     private fun setUiLoading(isLoading: Boolean) {
         binding.firstNameInput.isEnabled = !isLoading
         binding.lastNameInput.isEnabled = !isLoading
@@ -108,80 +128,145 @@ class SettingsFragment : Fragment() {
             getString(R.string.settings_save_button)
         }
     }
-    
-    private fun resetUI() {
-        setUiLoading(false)
-    }
-    
-    private fun saveUserData() {
-        try {
-            // Get input values
-            val firstName = binding.firstNameInput.text.toString().trim()
-            val lastName = binding.lastNameInput.text.toString().trim()
-            val company = binding.companyInput.text.toString().trim()
-            val salaryRateText = binding.salaryRateInput.text.toString().trim()
 
-            // Simple validation for salary rate
-            val salaryRate = if (salaryRateText.isNotEmpty()) {
-                try {
-                    salaryRateText.toDouble()
-                } catch (e: Exception) {
-                    binding.salaryRateInputLayout.error = "Invalid number"
-                    return
-                }
-            } else 0.0
-            
-            binding.salaryRateInputLayout.error = null
-            
-            // Show saving state
-            setUiLoading(true)
-            
-            // Perform the update
-            viewLifecycleOwner.lifecycleScope.launch {
-                try {
-                    // Create a map of fields to update in a single operation
-                    val updates = mapOf(
+    private fun saveUserData() {
+        val firstName = binding.firstNameInput.text.toString().trim()
+        val lastName = binding.lastNameInput.text.toString().trim()
+        val company = binding.companyInput.text.toString().trim()
+        val salaryRateText = binding.salaryRateInput.text.toString().trim()
+
+        val salaryRate = if (salaryRateText.isNotEmpty()) {
+            // Accept a comma decimal (locale keyboards) by normalizing to a dot.
+            salaryRateText.replace(',', '.').toDoubleOrNull() ?: run {
+                binding.salaryRateInputLayout.error = "Invalid number"
+                return
+            }
+        } else {
+            0.0
+        }
+        binding.salaryRateInputLayout.error = null
+
+        setUiLoading(true)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                userRepository.updateUserFields(
+                    mapOf(
                         "firstName" to firstName,
                         "lastName" to lastName,
                         "company" to company,
                         "salaryRate" to salaryRate,
                     )
-
-                    // Update all fields in a single Firestore operation
-                    userRepository.updateUserFields(updates)
-
-                    // Show success toast
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, getString(R.string.settings_updated_message), Toast.LENGTH_SHORT).show()
-                    }
-                    
-                    // Reload data to reflect changes
-                    loadUserData()
-                } catch (e: Exception) {
-                    // Show error toast with detailed message
-                    android.util.Log.e("SettingsFragment", "Failed to update settings", e)
-                    withContext(Dispatchers.Main) {
-                        val errorMsg = e.message ?: "Unknown error"
-                        Toast.makeText(context, "Failed to update: $errorMsg", Toast.LENGTH_LONG).show()
-                    }
+                )
+                if (_binding == null) return@launch
+                Toast.makeText(context, getString(R.string.settings_updated_message), Toast.LENGTH_SHORT).show()
+                loadUserData()
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                android.util.Log.e("SettingsFragment", "Failed to update settings", e)
+                if (_binding != null) {
+                    Toast.makeText(context, "Failed to update: ${e.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
                     setUiLoading(false)
                 }
             }
-        } catch (e: Exception) {
-            android.util.Log.e("SettingsFragment", "Error in saveUserData", e)
-            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-            setUiLoading(false)
         }
     }
 
+    // region profile photo
+
+    private fun showPhotoOptions() {
+        val options = arrayOf("Choose from Gallery", "Remove Photo")
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.settings_change_photo)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> openGallery()
+                    1 -> removeProfilePhoto()
+                }
+            }
+            .show()
+    }
+
+    private fun openGallery() {
+        imagePickerLauncher.launch(
+            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        )
+    }
+
+    private fun uploadProfilePhoto(imageUri: Uri) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                binding.profileImage.alpha = 0.5f
+                photoRepository.uploadProfilePhoto(imageUri)
+                if (_binding == null) return@launch
+                binding.profileImage.alpha = 1.0f
+                loadProfileImageForCurrentUser()
+                Toast.makeText(context, "Profile photo updated!", Toast.LENGTH_SHORT).show()
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (_binding != null) {
+                    binding.profileImage.alpha = 1.0f
+                    Toast.makeText(context, "Upload failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun removeProfilePhoto() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                photoRepository.deleteProfilePhoto()
+                val user = userRepository.getCurrentUserOnce()
+                if (_binding == null) return@launch
+                hasPhoto = false
+                showInitialsPlaceholder(user)
+                Toast.makeText(context, "Profile photo removed", Toast.LENGTH_SHORT).show()
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (_binding != null) {
+                    Toast.makeText(context, "Failed to remove photo: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun loadProfileImageForCurrentUser() {
+        val userId = auth.currentUser?.uid ?: return
+        val storageRef = FirebaseStorage.getInstance()
+            .reference.child("profile_images/$userId.jpg")
+        storageRef.downloadUrl.addOnSuccessListener { uri ->
+            if (!isAdded || _binding == null) return@addOnSuccessListener
+            hasPhoto = true
+            Glide.with(requireContext())
+                .load(uri)
+                .circleCrop()
+                .into(binding.profileImage)
+            binding.profileInitial.visibility = View.GONE
+        }
+        // On failure (e.g. no photo) the initials from bindUser stay shown — no refetch.
+    }
+
+    /** Initials on the green tint when there's no photo (e.g. "MU"). */
+    private fun showInitialsPlaceholder(user: User?) {
+        val first = user?.firstName?.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
+        val last = user?.lastName?.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
+        val initials = (first + last).ifBlank { "?" }
+        binding.profileImage.setImageDrawable(null)
+        binding.profileInitial.text = initials
+        binding.profileInitial.visibility = View.VISIBLE
+    }
+
+    // endregion
+
     private fun showLogoutConfirmationDialog() {
         AlertDialog.Builder(requireContext())
-            .setTitle("Logout")
-            .setMessage("Are you sure you want to logout?")
-            .setPositiveButton("Yes") { _, _ ->
-                logout()
-            }
-            .setNegativeButton("No", null)
+            .setTitle(R.string.settings_logout_dialog_title)
+            .setMessage(R.string.settings_logout_dialog_message)
+            .setPositiveButton(R.string.settings_logout_confirm) { _, _ -> logout() }
+            .setNegativeButton(R.string.cancel_button, null)
             .show()
     }
 
@@ -191,8 +276,15 @@ class SettingsFragment : Fragment() {
         requireActivity().finish()
     }
 
+    private fun appVersionName(): String = try {
+        val pm = requireContext().packageManager
+        pm.getPackageInfo(requireContext().packageName, 0).versionName ?: "1.0"
+    } catch (e: Exception) {
+        "1.0"
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-} 
+}

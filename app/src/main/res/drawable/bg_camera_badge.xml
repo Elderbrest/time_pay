@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Amber camera badge, bottom-right of the avatar, with a white ring so it reads
+     against the photo/tint behind it. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/md_secondary" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/white" />
+</shape>
