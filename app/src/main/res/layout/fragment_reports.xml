@@ -108,6 +108,118 @@
             tools:text="No hours logged in June"
             tools:visibility="visible" />
 
+        <!-- Bare daily bar chart sitting directly on the page (no card, no title) -->
+        <com.el.timepay.ui.widget.HoursBarChartView
+            android:id="@+id/chart"
+            android:layout_width="0dp"
+            android:layout_height="220dp"
+            android:layout_marginTop="@dimen/space_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/emptyStateText" />
+
+        <!-- Selected-day detail card (shown only when a bar is tapped) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/dayDetailCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_16"
+            android:visibility="gone"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+            app:cardCornerRadius="@dimen/radius_card"
+            app:cardElevation="@dimen/elevation_card_soft"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chart"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:strokeWidth="1dp"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_16">
+
+                <TextView
+                    android:id="@+id/dayDetailTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold"
+                    tools:text="Thursday 19 June" />
+
+                <!-- Worked summary line (done only) -->
+                <TextView
+                    android:id="@+id/dayDetailWorked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:fontFeatureSettings="tnum"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:visibility="gone"
+                    tools:text="Worked 8h · 09:00 → 18:00"
+                    tools:visibility="visible" />
+
+                <!-- Daily earnings row (done only) -->
+                <LinearLayout
+                    android:id="@+id/dayDetailEarningsRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_16"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/colorOutlineVariant" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_16"
+                        android:baselineAligned="false"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/calendar_daily_earnings"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/dayDetailEarningsValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFeatureSettings="tnum"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:textColor="?attr/colorOnSecondaryContainer"
+                            android:textStyle="bold"
+                            tools:text="PLN 160" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Empty / no-hours ghost line -->
+                <TextView
+                    android:id="@+id/dayDetailGhost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:visibility="gone"
+                    tools:text="No hours logged"
+                    tools:visibility="visible" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Summary stats: four separate tile cards in a 2x2 grid -->
         <LinearLayout
             android:id="@+id/statsGrid"
@@ -117,7 +229,8 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/emptyStateText">
+            app:layout_constraintTop_toBottomOf="@id/dayDetailCard"
+            app:layout_goneMarginTop="@dimen/space_16">
 
             <!-- Row 1: total hours · total earned -->
             <LinearLayout
@@ -303,167 +416,22 @@
                 tools:visibility="visible" />
         </LinearLayout>
 
-        <!-- Work Activity chart card: titled header + animated daily bar chart -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/activityCard"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_20"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-            app:cardCornerRadius="@dimen/radius_card"
-            app:cardElevation="@dimen/elevation_card_soft"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/statsGrid"
-            app:strokeColor="?attr/colorOutlineVariant"
-            app:strokeWidth="1dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/space_16">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/reports_activity_title"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_4"
-                    android:text="@string/reports_activity_subtitle"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
-
-                <!-- Animated daily bar chart (only worked days are drawn/clickable) -->
-                <com.el.timepay.ui.widget.HoursBarChartView
-                    android:id="@+id/chart"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_marginTop="@dimen/space_16" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
         <!-- Export the month as a PDF -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/exportPdfButton"
-            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_16"
-            android:text="@string/reports_export_pdf"
-            app:cornerRadius="@dimen/radius_small"
-            app:icon="@drawable/ic_export"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/activityCard" />
-
-        <!-- Selected-day detail card -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/dayDetailCard"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="52dp"
             android:layout_marginTop="@dimen/space_20"
-            android:visibility="gone"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-            app:cardCornerRadius="@dimen/radius_card"
-            app:cardElevation="@dimen/elevation_card_soft"
+            android:text="@string/reports_export_pdf"
+            android:textColor="?attr/colorPrimary"
+            android:textStyle="bold"
+            app:backgroundTint="@color/md_surface_container_high"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_export"
+            app:iconTint="?attr/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/exportPdfButton"
-            app:strokeColor="?attr/colorOutlineVariant"
-            app:strokeWidth="1dp"
-            tools:visibility="visible">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/space_16">
-
-                <TextView
-                    android:id="@+id/dayDetailTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold"
-                    tools:text="Thursday 19 June" />
-
-                <!-- Worked summary line (done only) -->
-                <TextView
-                    android:id="@+id/dayDetailWorked"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_12"
-                    android:fontFeatureSettings="tnum"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:visibility="gone"
-                    tools:text="Worked 8h · 09:00 → 18:00"
-                    tools:visibility="visible" />
-
-                <!-- Daily earnings row (done only) -->
-                <LinearLayout
-                    android:id="@+id/dayDetailEarningsRow"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_16"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    tools:visibility="visible">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?attr/colorOutlineVariant" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_16"
-                        android:baselineAligned="false"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/calendar_daily_earnings"
-                            android:textAppearance="?attr/textAppearanceBodyMedium"
-                            android:textColor="?attr/colorOnSurfaceVariant" />
-
-                        <TextView
-                            android:id="@+id/dayDetailEarningsValue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFeatureSettings="tnum"
-                            android:textAppearance="?attr/textAppearanceTitleMedium"
-                            android:textColor="?attr/colorOnSecondaryContainer"
-                            android:textStyle="bold"
-                            tools:text="PLN 160" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Empty / no-hours ghost line -->
-                <TextView
-                    android:id="@+id/dayDetailGhost"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_8"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:visibility="gone"
-                    tools:text="No hours logged"
-                    tools:visibility="visible" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            app:layout_constraintTop_toBottomOf="@id/statsGrid" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

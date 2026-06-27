@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
 import com.el.timepay.R
@@ -35,6 +36,8 @@ class HoursBarChartView @JvmOverloads constructor(
     private var selectedIndex: Int? = null
     private var animProgress: Float = 1f
     private var animator: ValueAnimator? = null
+    private var bounceOffset: Float = 0f
+    private var bounceAnimator: ValueAnimator? = null
 
     private val density = resources.displayMetrics.density
     private fun dp(value: Float) = value * density
@@ -48,6 +51,8 @@ class HoursBarChartView @JvmOverloads constructor(
     private val barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         color = ContextCompat.getColor(context, R.color.md_primary)
+        // Soften worked bars to ~80% to match the mock's primary-container/80 look.
+        alpha = 204
     }
     private val barSelectedPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -55,7 +60,9 @@ class HoursBarChartView @JvmOverloads constructor(
     }
     private val barEmptyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = ContextCompat.getColor(context, R.color.md_surface_container_high)
+        color = ContextCompat.getColor(context, R.color.md_outline_variant)
+        // Faint nub (outline-variant/~30) for day-off slots.
+        alpha = 80
     }
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -100,23 +107,27 @@ class HoursBarChartView @JvmOverloads constructor(
         this.data = data
         this.maxHours = if (maxHours <= 0.0) 10.0 else maxHours
         this.selectedIndex = null
+        stopBounceAnimation()
         startGrowAnimation()
     }
 
     /** Programmatically highlights [day] (or clears with null). Does NOT fire [onBarSelected]. */
     fun setSelectedDay(day: Int?) {
         selectedIndex = day?.let { d -> data.indexOfFirst { it.day == d }.takeIf { it >= 0 } }
+        syncBounceAnimation()
         invalidate()
     }
 
-    private fun startGrowAnimation() {
-        animator?.cancel()
-        val scale = Settings.Global.getFloat(
+    private fun animationsDisabled(): Boolean =
+        Settings.Global.getFloat(
             context.contentResolver,
             Settings.Global.ANIMATOR_DURATION_SCALE,
             1f,
-        )
-        if (scale == 0f) {
+        ) == 0f
+
+    private fun startGrowAnimation() {
+        animator?.cancel()
+        if (animationsDisabled()) {
             animProgress = 1f
             invalidate()
             return
@@ -131,6 +142,36 @@ class HoursBarChartView @JvmOverloads constructor(
             }
             start()
         }
+    }
+
+    /** Starts the bounce when a bar is selected, stops it otherwise. */
+    private fun syncBounceAnimation() {
+        if (selectedIndex != null) startBounceAnimation() else stopBounceAnimation()
+    }
+
+    private fun startBounceAnimation() {
+        if (bounceAnimator?.isRunning == true) return
+        if (animationsDisabled()) {
+            bounceOffset = 0f
+            return
+        }
+        bounceAnimator = ValueAnimator.ofFloat(0f, dp(4f)).apply {
+            duration = 700L
+            interpolator = AccelerateDecelerateInterpolator()
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            addUpdateListener {
+                bounceOffset = it.animatedValue as Float
+                invalidate()
+            }
+            start()
+        }
+    }
+
+    private fun stopBounceAnimation() {
+        bounceAnimator?.cancel()
+        bounceAnimator = null
+        bounceOffset = 0f
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -160,7 +201,8 @@ class HoursBarChartView @JvmOverloads constructor(
         labelPaint.textAlign = Paint.Align.CENTER
 
         val slot = chartWidth / count
-        val barWidth = slot * 0.55f
+        // Thin capsule bars (~6dp) to match the mock; never wider than half the slot.
+        val barWidth = (slot * 0.5f).coerceAtMost(dp(6f))
         val radius = barWidth / 2f
         val labelIndices = setOf(0, count / 4, count / 2, 3 * count / 4, count - 1)
 
@@ -185,8 +227,9 @@ class HoursBarChartView @JvmOverloads constructor(
                     drawValueChip(canvas, datum.hours, centerX, top)
                 }
             } else {
-                val barHeight = (chartHeight * 0.10f * animProgress).coerceAtLeast(dp(6f))
-                val top = baselineY - barHeight
+                // Day-off: a tiny faint nub pinned to the baseline.
+                val nubHeight = dp(2f) * animProgress
+                val top = baselineY - nubHeight
                 rect.set(left, top, right, baselineY + radius)
                 canvas.drawRoundRect(rect, radius, radius, barEmptyPaint)
             }
@@ -214,7 +257,9 @@ class HoursBarChartView @JvmOverloads constructor(
 
         var chipLeft = centerX - chipWidth / 2f
         chipLeft = chipLeft.coerceIn(paddingLeft.toFloat(), width - paddingRight - chipWidth)
-        val chipBottom = (barTop - dp(4f)).coerceAtLeast(paddingTop + chipHeight)
+        // Bob the chip up/down via bounceOffset (0 when reduced-motion).
+        val chipBottom =
+            (barTop - dp(4f) - bounceOffset).coerceAtLeast(paddingTop + chipHeight)
         val chipTop = chipBottom - chipHeight
 
         rect.set(chipLeft, chipTop, chipLeft + chipWidth, chipBottom)
@@ -246,6 +291,7 @@ class HoursBarChartView @JvmOverloads constructor(
         // Only worked days have a bar to select; a tap on a day-off slot clears.
         if (index in data.indices && data[index].hours > 0.0) {
             selectedIndex = if (index == selectedIndex) null else index
+            syncBounceAnimation()
             invalidate()
             onBarSelected?.invoke(selectedIndex?.let { data[it].day })
         } else {
@@ -256,6 +302,7 @@ class HoursBarChartView @JvmOverloads constructor(
     private fun clearSelection() {
         if (selectedIndex != null) {
             selectedIndex = null
+            stopBounceAnimation()
             invalidate()
             onBarSelected?.invoke(null)
         }
@@ -276,6 +323,7 @@ class HoursBarChartView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         animator?.cancel()
         animator = null
+        stopBounceAnimation()
         super.onDetachedFromWindow()
     }
 }

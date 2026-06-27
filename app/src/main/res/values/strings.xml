@@ -108,7 +108,7 @@
     <string name="reports_next_month">Next month</string>
     <string name="reports_activity_title">Work Activity</string>
     <string name="reports_activity_subtitle">Daily hours distribution</string>
-    <string name="reports_export_pdf">Export PDF</string>
+    <string name="reports_export_pdf">Export PDF Report</string>
     <string name="reports_export_empty">Nothing to export for %1$s</string>
     <string name="reports_export_failed">Couldn\'t create the PDF</string>
     <string name="reports_export_share_title">Share report</string>
