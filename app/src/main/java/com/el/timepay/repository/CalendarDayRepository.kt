@@ -21,15 +21,6 @@ class CalendarDayRepository {
             .collection("calendar")
     } ?: throw IllegalStateException("User is not authenticated")
 
-    suspend fun getDayInfo(date: String): CalendarDayInfo? {
-        val snapshot = collectionRef().document(date).get().await()
-        return if (snapshot.exists()) {
-            snapshot.toObject(CalendarDayInfo::class.java)
-        } else {
-            null
-        }
-    }
-
     suspend fun saveDayInfo(date: String, info: CalendarDayInfo) {
         collectionRef().document(date).set(info).await()
     }

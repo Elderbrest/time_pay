@@ -408,13 +408,11 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
         const val ACTION_LOGGED = "logged"
         const val ACTION_PLANNED = "planned"
         const val ACTION_REMOVED = "removed"
-        const val ACTION_NO_CHANGE = "noChange"
 
         private const val ARG_DATE = "arg_date"
         private const val ARG_STATUS = "arg_status"
         private const val ARG_START = "arg_start"
         private const val ARG_END = "arg_end"
-        private const val ARG_HOURS = "arg_hours"
         private const val ARG_NOTE = "arg_note"
         private const val ARG_RATE = "arg_rate"
         private const val ARG_LAST_START = "arg_last_start"
@@ -429,7 +427,6 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
             existingStatus: String?,
             existingStartTime: String?,
             existingEndTime: String?,
-            existingHours: Double?,
             existingNote: String?,
             salaryRate: Double,
             lastShiftStart: String?,
@@ -442,7 +439,6 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
                 ARG_STATUS to existingStatus,
                 ARG_START to existingStartTime,
                 ARG_END to existingEndTime,
-                ARG_HOURS to (existingHours ?: 0.0),
                 ARG_NOTE to existingNote,
                 ARG_RATE to salaryRate,
                 ARG_LAST_START to lastShiftStart,

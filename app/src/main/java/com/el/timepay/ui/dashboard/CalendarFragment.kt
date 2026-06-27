@@ -157,7 +157,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             existingStatus = info?.status,
             existingStartTime = info?.startTime,
             existingEndTime = info?.endTime,
-            existingHours = info?.hoursWorked,
             existingNote = info?.note,
             salaryRate = salaryRate,
             lastShiftStart = lastStart,

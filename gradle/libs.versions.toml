@@ -33,6 +33,8 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-appcheck-playintegrity = { group = "com.google.firebase", name = "firebase-appcheck-playintegrity" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 kizitonwose-calendar-view = { group = "com.kizitonwose.calendar", name = "view", version.ref = "kizitonwoseCalendar" }
 
@@ -40,3 +42,4 @@ kizitonwose-calendar-view = { group = "com.kizitonwose.calendar", name = "view",
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+google-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.2" }

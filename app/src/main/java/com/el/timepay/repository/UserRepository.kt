@@ -3,6 +3,7 @@ package com.el.timepay.repository
 import com.el.timepay.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 
 class UserRepository {
@@ -12,26 +13,19 @@ class UserRepository {
     suspend fun getCurrentUserOnce(): User? {
         val userId = auth.currentUser?.uid ?: return null
         return try {
-            // Always fetch from server first
+            // Cache-first default get(): serves from local cache when offline,
+            // and refreshes from the server when a connection is available.
             val document = db.collection("users")
                 .document(userId)
-                .get(com.google.firebase.firestore.Source.SERVER)
+                .get()
                 .await()
 
             document.toObject(User::class.java)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            try {
-                // Fallback to cache if server fetch fails
-                val document = db.collection("users")
-                    .document(userId)
-                    .get()
-                    .await()
-                
-                document.toObject(User::class.java)
-            } catch (e: Exception) {
-                android.util.Log.e("UserRepository", "Failed to fetch user data", e)
-                null
-            }
+            android.util.Log.e("UserRepository", "Failed to fetch user data", e)
+            null
         }
     }
 

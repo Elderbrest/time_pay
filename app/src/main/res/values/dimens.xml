@@ -1,9 +1,4 @@
 <resources>
-    <!-- Legacy aliases retained for backward compatibility — any existing
-         layouts still referencing these continue to resolve. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-
     <!-- TimePay spacing scale (DESIGN.md §2). -->
     <dimen name="space_4">4dp</dimen>
     <dimen name="space_8">8dp</dimen>
@@ -25,10 +20,7 @@
     <!-- Soft, even ambient card shadow for the auth cards — kept low so the
          shadow reads as a gentle halo rather than a deep pool below the card. -->
     <dimen name="elevation_card_soft">2dp</dimen>
-    <dimen name="radius_sheet">16dp</dimen>
-    <dimen name="radius_fab">20dp</dimen>
 
     <!-- Layout tokens (DESIGN.md §2). -->
     <dimen name="screen_padding_horizontal">20dp</dimen>
-    <dimen name="card_padding_internal">20dp</dimen>
 </resources>

@@ -97,7 +97,6 @@ class HomeFragment : Fragment() {
             existingStatus = info?.status,
             existingStartTime = info?.startTime,
             existingEndTime = info?.endTime,
-            existingHours = info?.hoursWorked,
             existingNote = info?.note,
             salaryRate = salaryRate,
             lastShiftStart = lastStart,
@@ -271,22 +270,16 @@ class HomeFragment : Fragment() {
     }
 
     private fun showImagePickerOptions() {
-        val options = arrayOf("Take Photo", "Choose from Gallery", "Remove Photo")
+        val options = arrayOf("Choose from Gallery", "Remove Photo")
         AlertDialog.Builder(requireContext())
             .setTitle("Profile Photo")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> openCamera()
-                    1 -> openGallery()
-                    2 -> removeProfilePhoto()
+                    0 -> openGallery()
+                    1 -> removeProfilePhoto()
                 }
             }
             .show()
-    }
-
-    private fun openCamera() {
-        // TODO: Implement camera functionality
-        Toast.makeText(context, "Camera functionality coming soon!", Toast.LENGTH_SHORT).show()
     }
 
     private fun openGallery() {

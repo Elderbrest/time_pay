@@ -52,7 +52,15 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.forgotPasswordText.setOnClickListener {
-            Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
+            val email = binding.emailInput.text.toString().trim()
+            if (email.isEmpty()) {
+                Toast.makeText(this, R.string.login_reset_need_email, Toast.LENGTH_SHORT).show()
+            } else {
+                // Generic confirmation regardless of outcome to avoid account enumeration.
+                auth.sendPasswordResetEmail(email).addOnCompleteListener {
+                    Toast.makeText(this, R.string.login_reset_sent, Toast.LENGTH_LONG).show()
+                }
+            }
         }
 
         // Set click listener for sign up text

@@ -47,6 +47,9 @@ class RegisterActivity : AppCompatActivity() {
 
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener {
+                    // Fire-and-forget verification email; don't block registration.
+                    auth.currentUser?.sendEmailVerification()
+
                     // Set display name in Firebase Auth
                     val profileUpdates = UserProfileChangeRequest.Builder()
                         .setDisplayName(fullName)

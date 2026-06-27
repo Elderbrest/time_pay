@@ -10,6 +10,10 @@ class TimePayApplication : Application() {
         super.onCreate()
         FirebaseApp.initializeApp(this)
 
+        com.google.firebase.appcheck.FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
+            com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory.getInstance()
+        )
+
         val settings = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)
             .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
