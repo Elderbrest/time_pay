@@ -58,7 +58,6 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.versionText.text = getString(R.string.settings_version, appVersionName())
         loadProfileImageForCurrentUser()
         loadUserData()
 
@@ -97,7 +96,6 @@ class SettingsFragment : Fragment() {
     private fun bindUser(user: User) {
         binding.firstNameInput.setText(user.firstName)
         binding.lastNameInput.setText(user.lastName)
-        binding.companyInput.setText(user.company)
 
         if (user.salaryRate > 0) {
             // Locale.US so the value always uses a dot — the parse on save is dot-only.
@@ -119,7 +117,6 @@ class SettingsFragment : Fragment() {
     private fun setUiLoading(isLoading: Boolean) {
         binding.firstNameInput.isEnabled = !isLoading
         binding.lastNameInput.isEnabled = !isLoading
-        binding.companyInput.isEnabled = !isLoading
         binding.salaryRateInput.isEnabled = !isLoading
         binding.saveSettingsButton.isEnabled = !isLoading
         binding.saveSettingsButton.text = if (isLoading) {
@@ -132,7 +129,6 @@ class SettingsFragment : Fragment() {
     private fun saveUserData() {
         val firstName = binding.firstNameInput.text.toString().trim()
         val lastName = binding.lastNameInput.text.toString().trim()
-        val company = binding.companyInput.text.toString().trim()
         val salaryRateText = binding.salaryRateInput.text.toString().trim()
 
         val salaryRate = if (salaryRateText.isNotEmpty()) {
@@ -154,7 +150,6 @@ class SettingsFragment : Fragment() {
                     mapOf(
                         "firstName" to firstName,
                         "lastName" to lastName,
-                        "company" to company,
                         "salaryRate" to salaryRate,
                     )
                 )
@@ -274,13 +269,6 @@ class SettingsFragment : Fragment() {
         auth.signOut()
         startActivity(Intent(requireContext(), LoginActivity::class.java))
         requireActivity().finish()
-    }
-
-    private fun appVersionName(): String = try {
-        val pm = requireContext().packageManager
-        pm.getPackageInfo(requireContext().packageName, 0).versionName ?: "1.0"
-    } catch (e: Exception) {
-        "1.0"
     }
 
     override fun onDestroyView() {

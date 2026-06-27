@@ -17,22 +17,12 @@
         android:paddingTop="@dimen/space_48"
         android:paddingBottom="96dp">
 
-        <!-- Screen title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_title"
-            android:textAppearance="?attr/textAppearanceHeadlineSmall"
-            android:textColor="?attr/colorOnSurface"
-            android:textStyle="bold" />
-
         <!-- Profile header: avatar + camera badge, name, email -->
         <FrameLayout
             android:id="@+id/profileAvatar"
             android:layout_width="88dp"
             android:layout_height="88dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/space_32">
+            android:layout_gravity="center_horizontal">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/profileImage"
@@ -210,39 +200,6 @@
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </LinearLayout>
-
-                <!-- Company -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_16"
-                    android:layout_marginBottom="@dimen/space_8"
-                    android:text="@string/settings_company"
-                    android:textAllCaps="true"
-                    android:textAppearance="?attr/textAppearanceLabelSmall"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/companyInputLayout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:boxBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:boxCornerRadiusBottomEnd="@dimen/radius_small"
-                    app:boxCornerRadiusBottomStart="@dimen/radius_small"
-                    app:boxCornerRadiusTopEnd="@dimen/radius_small"
-                    app:boxCornerRadiusTopStart="@dimen/radius_small"
-                    app:boxStrokeColor="?attr/colorPrimary"
-                    app:hintEnabled="false">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/companyInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/settings_company_hint"
-                        android:inputType="textCapWords" />
-                </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -351,16 +308,6 @@
             android:textColor="?attr/colorError"
             app:cornerRadius="@dimen/radius_small"
             app:strokeColor="?attr/colorError" />
-
-        <TextView
-            android:id="@+id/versionText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_24"
-            android:gravity="center"
-            android:textAppearance="?attr/textAppearanceLabelSmall"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            tools:text="TimePay v1.0.1" />
 
     </LinearLayout>
 
