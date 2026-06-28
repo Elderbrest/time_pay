@@ -11,6 +11,14 @@
     <string name="login_forgot_password">Forgot password?</string>
     <string name="login_reset_need_email">Enter your email first</string>
     <string name="login_reset_sent">If that email is registered, a reset link has been sent.</string>
+    <string name="forgot_title">Reset password</string>
+    <string name="forgot_subtitle">Enter the email for your account and we\'ll send you a link to reset your password.</string>
+    <string name="forgot_email_label">Email Address</string>
+    <string name="forgot_send_button">Send reset link</string>
+    <string name="forgot_back_to_login">Back to log in</string>
+    <string name="forgot_invalid_email">Enter a valid email address</string>
+    <string name="forgot_sent_title">Check your email</string>
+    <string name="forgot_sent_body">If an account exists for %1$s, a password reset link is on its way. Check your inbox (and spam).</string>
     <string name="coming_soon">Coming soon</string>
     <string name="register_title">Create your account</string>
     <string name="register_full_name">Full Name</string>

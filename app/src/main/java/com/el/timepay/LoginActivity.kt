@@ -52,15 +52,11 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.forgotPasswordText.setOnClickListener {
-            val email = binding.emailInput.text.toString().trim()
-            if (email.isEmpty()) {
-                Toast.makeText(this, R.string.login_reset_need_email, Toast.LENGTH_SHORT).show()
-            } else {
-                // Generic confirmation regardless of outcome to avoid account enumeration.
-                auth.sendPasswordResetEmail(email).addOnCompleteListener {
-                    Toast.makeText(this, R.string.login_reset_sent, Toast.LENGTH_LONG).show()
-                }
+            // Open the dedicated reset screen, pre-filling any email already typed.
+            val intent = Intent(this, ForgotPasswordActivity::class.java).apply {
+                putExtra(ForgotPasswordActivity.EXTRA_EMAIL, binding.emailInput.text.toString().trim())
             }
+            startActivity(intent)
         }
 
         // Set click listener for sign up text

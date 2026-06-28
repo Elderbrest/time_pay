@@ -21,6 +21,10 @@
             android:exported="false"
             android:theme="@style/Theme.TimePay.Login" />
         <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimePay.Login" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.TimePay.Login">
