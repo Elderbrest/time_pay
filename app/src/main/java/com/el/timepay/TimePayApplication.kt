@@ -1,6 +1,7 @@
 package com.el.timepay
 
 import android.app.Application
+import com.el.timepay.util.Analytics
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -13,6 +14,8 @@ class TimePayApplication : Application() {
         com.google.firebase.appcheck.FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
             com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory.getInstance()
         )
+
+        Analytics.init(this)
 
         val settings = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)

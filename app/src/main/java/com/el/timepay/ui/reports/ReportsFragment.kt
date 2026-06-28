@@ -295,6 +295,7 @@ class ReportsFragment : Fragment() {
         startActivity(
             Intent.createChooser(intent, getString(R.string.reports_export_share_title)),
         )
+        com.el.timepay.util.Analytics.logReportExported()
     }
 
     override fun onDestroyView() {

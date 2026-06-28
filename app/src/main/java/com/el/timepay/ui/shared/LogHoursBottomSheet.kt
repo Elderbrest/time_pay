@@ -46,6 +46,9 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
     private var salaryRate: Double = 0.0
     private var requestKey: String = DEFAULT_REQUEST_KEY
 
+    /** Entry point for analytics: Home opens the sheet with planning disabled. */
+    private var analyticsSource: String = com.el.timepay.util.Analytics.SOURCE_CALENDAR
+
     private var startT: LocalTime = LocalTime.of(9, 0)
     private var endT: LocalTime = LocalTime.of(18, 0)
     private var hours: Double = 0.0
@@ -110,7 +113,13 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
         btnLog.setOnClickListener { applyMode(logMode = true) }
         btnPlan.setOnClickListener { applyMode(logMode = false) }
         intentToggle.check(R.id.sheetBtnLog)
-        if (!args.getBoolean(ARG_ALLOW_PLAN, true)) {
+        val allowPlan = args.getBoolean(ARG_ALLOW_PLAN, true)
+        analyticsSource = if (allowPlan) {
+            com.el.timepay.util.Analytics.SOURCE_CALENDAR
+        } else {
+            com.el.timepay.util.Analytics.SOURCE_HOME
+        }
+        if (!allowPlan) {
             intentToggle.visibility = View.GONE
         }
 
@@ -301,6 +310,7 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
         lifecycleScope.launch {
             try {
                 calendarRepository.deleteDayInfo(key)
+                com.el.timepay.util.Analytics.logDayRemoved()
                 deliverResult(ACTION_REMOVED, 0.0)
                 dismiss()
             } catch (e: Exception) {
@@ -333,12 +343,14 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
                             "note" to note
                         )
                     )
+                    com.el.timepay.util.Analytics.logHoursLogged(analyticsSource, loggedHours)
                     deliverResult(ACTION_LOGGED, loggedHours)
                 } else {
                     calendarRepository.saveDayInfo(
                         key,
                         CalendarDayInfo(status = "working", note = note)
                     )
+                    com.el.timepay.util.Analytics.logDayPlanned(analyticsSource)
                     deliverResult(ACTION_PLANNED, 0.0)
                 }
                 dismiss()

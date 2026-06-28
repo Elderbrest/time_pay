@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
     implementation(libs.firebase.appcheck.playintegrity)
 
     // Glide for image loading

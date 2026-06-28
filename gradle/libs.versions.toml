@@ -34,6 +34,7 @@ firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" 
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
 firebase-appcheck-playintegrity = { group = "com.google.firebase", name = "firebase-appcheck-playintegrity" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 kizitonwose-calendar-view = { group = "com.kizitonwose.calendar", name = "view", version.ref = "kizitonwoseCalendar" }

@@ -153,6 +153,7 @@ class SettingsFragment : Fragment() {
                         "salaryRate" to salaryRate,
                     )
                 )
+                if (salaryRate > 0.0) com.el.timepay.util.Analytics.logRateSet()
                 if (_binding == null) return@launch
                 Toast.makeText(context, getString(R.string.settings_updated_message), Toast.LENGTH_SHORT).show()
                 loadUserData()
