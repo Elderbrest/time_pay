@@ -21,8 +21,8 @@ android {
         applicationId = "com.el.timepay"
         minSdk = 26
         targetSdk = 35
-        versionCode = 12
-        versionName = "2.0.0"
+        versionCode = 13
+        versionName = "2.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -64,6 +64,7 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity.ktx)
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.lifecycle.livedata.ktx)

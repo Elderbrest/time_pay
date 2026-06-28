@@ -1,10 +1,7 @@
 package com.el.timepay.ui.home
 
-import android.app.Activity
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,14 +36,11 @@ class HomeFragment : Fragment() {
     private var loadedDays: Map<String, CalendarDayInfo> = emptyMap()
     private var salaryRate: Double = 0.0
 
+    // Android Photo Picker — lets the user pick one image with NO storage permission.
     private val imagePickerLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                uploadProfilePhoto(uri)
-            }
-        }
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let { uploadProfilePhoto(it) }
     }
 
     override fun onCreateView(
@@ -283,8 +277,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun openGallery() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        imagePickerLauncher.launch(intent)
+        imagePickerLauncher.launch(
+            androidx.activity.result.PickVisualMediaRequest(
+                ActivityResultContracts.PickVisualMedia.ImageOnly
+            )
+        )
     }
 
     private fun removeProfilePhoto() {

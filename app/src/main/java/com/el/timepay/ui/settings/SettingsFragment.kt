@@ -1,10 +1,8 @@
 package com.el.timepay.ui.settings
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,12 +36,11 @@ class SettingsFragment : Fragment() {
     /** True once a profile photo has loaded, so initials don't paint over it. */
     private var hasPhoto = false
 
+    // Android Photo Picker — pick one image with NO storage permission.
     private val imagePickerLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri -> uploadProfilePhoto(uri) }
-        }
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let { uploadProfilePhoto(it) }
     }
 
     override fun onCreateView(
@@ -186,7 +183,9 @@ class SettingsFragment : Fragment() {
 
     private fun openGallery() {
         imagePickerLauncher.launch(
-            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            androidx.activity.result.PickVisualMediaRequest(
+                ActivityResultContracts.PickVisualMedia.ImageOnly
+            )
         )
     }
 
