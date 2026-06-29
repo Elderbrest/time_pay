@@ -39,6 +39,15 @@ Ordered loosely by user-visible value.
 **Where:** `LogHoursBottomSheet.kt:214 pickTime()` — swap the `AlertDialog` + `dialog_time_picker.xml` for `MaterialTimePicker.Builder()...build()` shown via `childFragmentManager`; read result from `picker.hour`/`picker.minute` in the positive-button listener. Then delete `res/layout/dialog_time_picker.xml` and the `ThemeOverlay.TimePay.SpinnerDialog` style (no longer needed). Material Components dep is already present (`libs.material`).
 **Note:** pairs naturally with backlog #2 (log-sheet default times) since both touch `pickTime`/the time flow.
 
+### 4. Two PDF export options: with-money vs hours-only  ⭐ user-requested
+**Want:** the Reports export should offer **two PDF variants**:
+1. **Full report** (as today) — hours **+** earnings/rate/money columns + totals. The "payslip" view.
+2. **Hours-only / payment-agnostic** — working hours only, **NO money anywhere** (no rate, no per-day earnings column, no "Total earned", no currency). For sharing with someone who shouldn't see pay (e.g. a manager/coordinator who only needs hours).
+**Also:** both PDFs must use the new **H:MM time format** (covered by backlog #1, which already lists `MonthlyReportPdf.kt:32`).
+**Where:** `util/MonthlyReportPdf.kt` — add a param e.g. `includeEarnings: Boolean` (or an `enum ReportStyle { FULL, HOURS_ONLY }`) to `build(...)`. When false: drop the Earnings table column, the "Total earned" / "Avg" money stats, and the rate line; widen the Hours/time columns to fill; change the title/filename suffix (e.g. `TimePay-2026-06-hours.pdf` vs `TimePay-2026-06.pdf`). Keep the date · hours · start→end columns.
+**UI (`ReportsFragment` + `fragment_reports.xml`):** the single "Export PDF" button becomes a choice — either two buttons ("Export full report" / "Export hours only") or one button that opens a small chooser (bottom sheet / dialog: "Include earnings?" → Full / Hours only). Then call `MonthlyReportPdf.build(..., includeEarnings = …)` and share as today. New strings for the labels.
+**Note:** the hours-only variant naturally also sidesteps the "set your rate to see earnings" empty state — useful for users who never set a rate.
+
 ---
 
 ## Deferred from the pre-launch audit (Tier 2 — "professional hardening")
