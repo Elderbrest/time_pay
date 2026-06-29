@@ -32,6 +32,13 @@ Ordered loosely by user-visible value.
 **Where:** `ui/shared/LogHoursBottomSheet.kt:96-101` — drop the `lastStart`/`lastEnd` fallback for new days; keep `existingStart`/`existingEnd` for editing. Also remove the now-unused `lastShift()` helpers in `HomeFragment.kt` and `CalendarFragment.kt` + the `ARG_LAST_START`/`ARG_LAST_END` plumbing if no longer used.
 **Note:** "remember last shift" was an earlier deliberate choice (save typing for regular hours) — user has decided a fixed 09:00–18:00 default is clearer. Straightforward change.
 
+### 3. Time picker should allow typing, not just scrolling  ⭐ user-requested
+**Problem:** The Start/End time picker is the **legacy `android.widget.TimePicker` locked to `android:timePickerMode="spinner"`** (`res/layout/dialog_time_picker.xml`), so users can only scroll the wheels. Typing the numbers in doesn't fully work — the legacy spinner has no real keyboard-entry mode.
+**Want:** let the user **type hours/minutes directly** (a text/keyboard input mode) as well as scroll.
+**Recommended fix:** replace the custom legacy-TimePicker dialog with **`MaterialTimePicker`** (com.google.android.material.timepicker) — it has a built-in **keyboard ⇄ clock toggle** (`setInputMode(INPUT_MODE_KEYBOARD)` default + the toggle button lets users switch), 24h via `setTimeFormat(TimeFormat.CLOCK_24H)`, themable to brand green. Cleaner, modern, and solves the typing request out of the box.
+**Where:** `LogHoursBottomSheet.kt:214 pickTime()` — swap the `AlertDialog` + `dialog_time_picker.xml` for `MaterialTimePicker.Builder()...build()` shown via `childFragmentManager`; read result from `picker.hour`/`picker.minute` in the positive-button listener. Then delete `res/layout/dialog_time_picker.xml` and the `ThemeOverlay.TimePay.SpinnerDialog` style (no longer needed). Material Components dep is already present (`libs.material`).
+**Note:** pairs naturally with backlog #2 (log-sheet default times) since both touch `pickTime`/the time flow.
+
 ---
 
 ## Deferred from the pre-launch audit (Tier 2 — "professional hardening")
