@@ -45,6 +45,15 @@ Ordered loosely by user-visible value.
 
 ---
 
+## Resolved issues (kept for the record)
+
+### ✓ Profile photo upload failing — FIXED (no code change)
+**Symptom:** uploading/changing avatar threw errors — "first permissions, then a request error."
+**Two stacked causes, both now fixed:**
+1. **Permission/picker layer** — the old `ACTION_PICK` + `READ_MEDIA_IMAGES` flow failed on Android 13+. Fixed in **2.0.1** by switching to the Android Photo Picker (`PickVisualMedia`), which needs no permission. (Same change that resolved the Play Store photo-permission rejection.)
+2. **Firebase billing** — Cloud Storage returned **HTTP 402**: "Cloud Storage for Firebase no longer supports the no-cost Spark plan" (Google policy, announced Sept 2024). Project was on Spark, so *every* Storage op (upload AND `getDownloadUrl`) failed. **Fixed by upgrading the project `time-and-work-78615` to the Blaze pay-as-you-go plan** (2026-06-29). Free tier covers the app's usage (~5GB storage / 1GB-day download); a $1 budget alert is the safety net. Verified: `billingEnabled: true`, `firebasestorage.googleapis.com` enabled, and a previously-uploaded avatar now loads again.
+**No redeploy needed** — billing is a server-side switch; reaches all app versions. Full end-to-end photo flow works once 2.0.1 (Photo Picker) is live + Blaze (Storage) — both now true.
+
 ## App Check (operational, not code)
 9. **Enforce Firebase App Check** — the Play Integrity provider is installed in the app, but enforcement is intentionally OFF in the Firebase console (so it can't lock users out at launch). Turn enforcement ON for Firestore/Storage/Auth a few days after 2.0.x is live and verified stable. Register the release SHA-256 (`3D:AE:...` debug / the real key's SHA) + a debug token for emulator testing. (security H1)
 
