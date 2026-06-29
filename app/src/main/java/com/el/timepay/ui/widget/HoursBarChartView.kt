@@ -274,8 +274,7 @@ class HoursBarChartView @JvmOverloads constructor(
     }
 
     private fun formatHours(hours: Double): String =
-        if (hours % 1.0 == 0.0) hours.toInt().toString()
-        else String.format(java.util.Locale.US, "%.1f", hours)
+        com.el.timepay.util.TimeFormat.hoursToHm(hours)
 
     private fun handleTap(x: Float) {
         val count = data.size

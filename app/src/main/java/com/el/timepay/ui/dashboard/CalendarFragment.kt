@@ -60,10 +60,9 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     // region formatting helpers (match HomeFragment)
 
-    /** Formats hours without a trailing ".0" (8.0 -> "8", 8.5 -> "8.5"), locale-stable. */
+    /** Worked hours as H:MM (8.25 -> "8:15"), via the shared formatter. */
     private fun formatHours(hours: Double): String =
-        if (hours % 1.0 == 0.0) hours.toInt().toString()
-        else String.format(Locale.US, "%.1f", hours)
+        com.el.timepay.util.TimeFormat.hoursToHm(hours)
 
     /** "PLN 920" / "PLN 920.50", locale-stable. */
     private fun formatEarnings(earnings: Double): String {
@@ -140,18 +139,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         openLogSheet(date)
     }
 
-    /** Most recent "done" day's start/end, used to pre-fill the sheet's time pickers. */
-    private fun lastShift(): Pair<String?, String?> {
-        val last = loadedDays.entries
-            .filter { it.value.status == "done" && it.value.startTime != null && it.value.endTime != null }
-            .maxByOrNull { it.key }
-            ?.value
-        return last?.startTime to last?.endTime
-    }
-
     private fun openLogSheet(date: LocalDate) {
         val info = dayInfoFor(date)
-        val (lastStart, lastEnd) = lastShift()
         LogHoursBottomSheet.newInstance(
             targetDate = date,
             existingStatus = info?.status,
@@ -159,8 +148,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             existingEndTime = info?.endTime,
             existingNote = info?.note,
             salaryRate = salaryRate,
-            lastShiftStart = lastStart,
-            lastShiftEnd = lastEnd,
             requestKey = LogHoursBottomSheet.DEFAULT_REQUEST_KEY
         ).show(childFragmentManager, "log_hours")
     }

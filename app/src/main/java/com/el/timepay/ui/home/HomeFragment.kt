@@ -73,19 +73,9 @@ class HomeFragment : Fragment() {
         ) { _, _ -> loadUserData() }
     }
 
-    /** Most recent "done" day's start/end, used to pre-fill the sheet's time pickers. */
-    private fun lastShift(): Pair<String?, String?> {
-        val last = loadedDays.entries
-            .filter { it.value.status == "done" && it.value.startTime != null && it.value.endTime != null }
-            .maxByOrNull { it.key }
-            ?.value
-        return last?.startTime to last?.endTime
-    }
-
     private fun openLogSheet(date: LocalDate) {
         val key = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         val info = loadedDays[key]
-        val (lastStart, lastEnd) = lastShift()
         LogHoursBottomSheet.newInstance(
             targetDate = date,
             existingStatus = info?.status,
@@ -93,8 +83,6 @@ class HomeFragment : Fragment() {
             existingEndTime = info?.endTime,
             existingNote = info?.note,
             salaryRate = salaryRate,
-            lastShiftStart = lastStart,
-            lastShiftEnd = lastEnd,
             requestKey = LogHoursBottomSheet.DEFAULT_REQUEST_KEY,
             allowPlan = false
         ).show(childFragmentManager, "log_hours")
@@ -132,10 +120,9 @@ class HomeFragment : Fragment() {
         }
     }
 
-    /** Formats hours without a trailing ".0" (8.0 -> "8", 8.5 -> "8.5"), locale-stable. */
+    /** Worked hours as H:MM (8.25 -> "8:15"), via the shared formatter. */
     private fun formatHours(hours: Double): String =
-        if (hours % 1.0 == 0.0) hours.toInt().toString()
-        else String.format(java.util.Locale.US, "%.1f", hours)
+        com.el.timepay.util.TimeFormat.hoursToHm(hours)
 
     private fun updateWeeklyOverviewCard(
         days: Map<String, CalendarDayInfo>,
@@ -199,7 +186,7 @@ class HomeFragment : Fragment() {
                 val currentMonth = YearMonth.now()
                 val days = calendarRepository.getCurrentMonthDates(currentMonth)
 
-                // Cache for the shared log sheet (today's info + last-shift pre-fill).
+                // Cache for the shared log sheet (today's existing info, if any).
                 loadedDays = days
                 salaryRate = user?.salaryRate ?: 0.0
 

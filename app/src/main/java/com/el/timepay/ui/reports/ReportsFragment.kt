@@ -51,10 +51,9 @@ class ReportsFragment : Fragment() {
 
     // region formatting helpers (match CalendarFragment)
 
-    /** Formats hours without a trailing ".0" (8.0 -> "8", 8.5 -> "8.5"), locale-stable. */
+    /** Worked hours as H:MM (8.25 -> "8:15"), via the shared formatter. */
     private fun formatHours(hours: Double): String =
-        if (hours % 1.0 == 0.0) hours.toInt().toString()
-        else String.format(Locale.US, "%.1f", hours)
+        com.el.timepay.util.TimeFormat.hoursToHm(hours)
 
     /** "PLN 920" / "PLN 920.50", locale-stable. */
     private fun formatEarnings(earnings: Double): String {
@@ -100,7 +99,16 @@ class ReportsFragment : Fragment() {
 
         binding.chart.onBarSelected = { day -> showDayDetail(day) }
 
-        binding.exportPdfButton.setOnClickListener { exportPdf() }
+        binding.exportPdfButton.setOnClickListener { openExportChooser() }
+
+        // The export chooser sheet reports back which variant to build + share.
+        childFragmentManager.setFragmentResultListener(
+            ExportOptionsBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val includeEarnings = bundle.getBoolean(ExportOptionsBottomSheet.RESULT_INCLUDE_EARNINGS, true)
+            exportPdf(includeEarnings)
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             salaryRate = userRepository.getCurrentUserOnce()?.salaryRate ?: 0.0
@@ -233,13 +241,13 @@ class ReportsFragment : Fragment() {
         }
     }
 
-    private fun exportPdf() {
-        val monthLabel = currentMonth.month.name
-            .lowercase()
-            .replaceFirstChar { it.uppercase() }
-
+    /** Guards against an empty month, then opens the full/hours-only chooser sheet. */
+    private fun openExportChooser() {
         val hasDoneDays = loadedDays.values.any { it.status == "done" }
         if (!hasDoneDays) {
+            val monthLabel = currentMonth.month.name
+                .lowercase()
+                .replaceFirstChar { it.uppercase() }
             Toast.makeText(
                 requireContext(),
                 getString(R.string.reports_export_empty, monthLabel),
@@ -247,7 +255,11 @@ class ReportsFragment : Fragment() {
             ).show()
             return
         }
+        ExportOptionsBottomSheet.newInstance(hasRate = salaryRate > 0.0)
+            .show(childFragmentManager, "export_options")
+    }
 
+    private fun exportPdf(includeEarnings: Boolean) {
         binding.exportPdfButton.isEnabled = false
         val month = currentMonth
         val days = loadedDays
@@ -262,6 +274,7 @@ class ReportsFragment : Fragment() {
                         days,
                         rate,
                         getString(R.string.currency_code),
+                        includeEarnings = includeEarnings,
                     )
                 }
                 if (_binding == null) return@launch

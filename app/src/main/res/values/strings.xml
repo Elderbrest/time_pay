@@ -120,6 +120,12 @@
     <string name="reports_export_empty">Nothing to export for %1$s</string>
     <string name="reports_export_failed">Couldn\'t create the PDF</string>
     <string name="reports_export_share_title">Share report</string>
+    <string name="reports_export_sheet_title">Export report</string>
+    <string name="reports_export_full">Full report</string>
+    <string name="reports_export_full_sub">Hours and earnings</string>
+    <string name="reports_export_full_sub_no_rate">Set your rate to include earnings</string>
+    <string name="reports_export_hours_only">Hours only</string>
+    <string name="reports_export_hours_only_sub">No pay details</string>
     <string name="currency_code">PLN</string>
     <string name="month_year_format">%1$s %2$d</string>
     <string name="loading_button">Loading &#8230;</string>
