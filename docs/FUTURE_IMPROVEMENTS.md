@@ -45,8 +45,16 @@ Ordered loosely by user-visible value.
 2. **Hours-only / payment-agnostic** — working hours only, **NO money anywhere** (no rate, no per-day earnings column, no "Total earned", no currency). For sharing with someone who shouldn't see pay (e.g. a manager/coordinator who only needs hours).
 **Also:** both PDFs must use the new **H:MM time format** (covered by backlog #1, which already lists `MonthlyReportPdf.kt:32`).
 **Where:** `util/MonthlyReportPdf.kt` — add a param e.g. `includeEarnings: Boolean` (or an `enum ReportStyle { FULL, HOURS_ONLY }`) to `build(...)`. When false: drop the Earnings table column, the "Total earned" / "Avg" money stats, and the rate line; widen the Hours/time columns to fill; change the title/filename suffix (e.g. `TimePay-2026-06-hours.pdf` vs `TimePay-2026-06.pdf`). Keep the date · hours · start→end columns.
-**UI (`ReportsFragment` + `fragment_reports.xml`):** the single "Export PDF" button becomes a choice — either two buttons ("Export full report" / "Export hours only") or one button that opens a small chooser (bottom sheet / dialog: "Include earnings?" → Full / Hours only). Then call `MonthlyReportPdf.build(..., includeEarnings = …)` and share as today. New strings for the labels.
-**Note:** the hours-only variant naturally also sidesteps the "set your rate to see earnings" empty state — useful for users who never set a rate.
+**UI — DECIDED (user chose: one button → chooser bottom sheet):**
+- Keep the **single "Export PDF" button** on Reports (no layout change / no extra visual weight).
+- Tapping it opens a **bottom sheet** styled like the existing log-hours sheet (rounded top, `colorSurface`), title "Export report", with two tappable rows:
+  - **Full report** — subtitle "Hours and earnings" (icon: document)
+  - **Hours only** — subtitle "No pay details" (icon: clock)
+- Tap a row → build that variant → fire the existing `ACTION_SEND` share chooser → dismiss the sheet.
+- Implement the sheet as a `BottomSheetDialogFragment` (or a simple `MaterialAlertDialog` list if lighter is preferred), new layout `bottom_sheet_export.xml`. Then call `MonthlyReportPdf.build(..., includeEarnings = true/false)`.
+- **Distinct filenames** so they don't collide when shared: `TimePay-2026-06.pdf` (full) vs `TimePay-2026-06-hours.pdf` (hours-only).
+- **No-rate touch:** if `salaryRate <= 0`, de-emphasize the "Full report" row or show hint "Set your rate to include earnings" (a full report with no rate ≈ an hours report). "Hours only" is always fully useful.
+- New strings: `reports_export_sheet_title`, `reports_export_full` / `_full_sub`, `reports_export_hours_only` / `_hours_only_sub`.
 
 ---
 
