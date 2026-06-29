@@ -1,22 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    TimePay launcher foreground: a bold, centered white "T" lettermark.
-    Drawn within the adaptive-icon safe zone so it is never clipped by the
-    launcher's round/squircle mask. Rounded ends match TimePay's design system.
+    TimePay launcher foreground: a bold green "T" lettermark, flat bottom with
+    subtly rounded corners. Sized within the adaptive-icon safe zone so it is
+    never clipped by the launcher's round/squircle mask.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- Top bar of the T -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M38.5,37 H69.5 A6.5,6.5 0 0 1 69.5,50 H38.5 A6.5,6.5 0 0 1 38.5,37 Z" />
-
-    <!-- Vertical stem of the T (rounded bottom) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M47,37 H61 V73.5 A6.5,6.5 0 0 1 47,73.5 Z" />
+        android:fillColor="#2E5D4F"
+        android:pathData="M34,36 H74 A3,3 0 0 1 77,39 V45 A3,3 0 0 1 74,48 H60 V72 A3,3 0 0 1 57,75 H51 A3,3 0 0 1 48,72 V48 H34 A3,3 0 0 1 31,45 V39 A3,3 0 0 1 34,36 Z" />
 </vector>
