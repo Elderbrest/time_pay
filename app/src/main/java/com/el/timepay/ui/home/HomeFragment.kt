@@ -35,6 +35,7 @@ class HomeFragment : Fragment() {
 
     private var loadedDays: Map<String, CalendarDayInfo> = emptyMap()
     private var salaryRate: Double = 0.0
+    private var currencyCode: String = com.el.timepay.util.MoneyFormat.DEFAULT_CODE
 
     // Android Photo Picker — lets the user pick one image with NO storage permission.
     private val imagePickerLauncher = registerForActivityResult(
@@ -83,6 +84,7 @@ class HomeFragment : Fragment() {
             existingEndTime = info?.endTime,
             existingNote = info?.note,
             salaryRate = salaryRate,
+            currencyCode = currencyCode,
             requestKey = LogHoursBottomSheet.DEFAULT_REQUEST_KEY,
             allowPlan = false
         ).show(childFragmentManager, "log_hours")
@@ -124,6 +126,10 @@ class HomeFragment : Fragment() {
     private fun formatHours(hours: Double): String =
         com.el.timepay.util.TimeFormat.hoursToHm(hours)
 
+    /** Earnings in the user's currency ("PLN 920.50"), via the shared formatter. */
+    private fun formatEarnings(earnings: Double): String =
+        com.el.timepay.util.MoneyFormat.format(earnings, currencyCode)
+
     private fun updateWeeklyOverviewCard(
         days: Map<String, CalendarDayInfo>,
         user: User
@@ -147,13 +153,6 @@ class HomeFragment : Fragment() {
 
         binding.hoursThisWeekText.text = getString(R.string.home_hours_short, formatHours(hours))
         binding.earningsThisWeekText.text = formatEarnings(earnings)
-    }
-
-    /** "PLN 920" / "PLN 920.50", locale-stable. */
-    private fun formatEarnings(earnings: Double): String {
-        val code = getString(R.string.currency_code)
-        return if (earnings % 1.0 == 0.0) "$code ${earnings.toInt()}"
-        else "$code " + String.format(java.util.Locale.US, "%.2f", earnings)
     }
 
     private fun updateMonthlyOverviewCard(
@@ -189,6 +188,7 @@ class HomeFragment : Fragment() {
                 // Cache for the shared log sheet (today's existing info, if any).
                 loadedDays = days
                 salaryRate = user?.salaryRate ?: 0.0
+                currencyCode = user?.currencyCode ?: com.el.timepay.util.MoneyFormat.DEFAULT_CODE
 
                 // If the current week (Mon..Sun) spans into the previous month,
                 // fetch the previous month's data as well so weekly stats don't undercount.

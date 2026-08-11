@@ -31,10 +31,14 @@ object MonthlyReportPdf {
     /** Worked hours as H:MM with a small unit label (8.25 -> "8:15h"). */
     private fun formatHours(hours: Double): String = "${TimeFormat.hoursToHm(hours)}h"
 
-    /** "PLN 160" / "PLN 160.50". */
+    /**
+     * "PLN 160" / "INR 160.50" — the ALPHA-CODE variant of [MoneyFormat] on purpose.
+     * This canvas draws with [Typeface.DEFAULT], which has no guaranteed coverage of
+     * currency glyphs like ₹ or ₦; a missing one would print as a tofu box in a
+     * document the user shares. On-screen UI uses the symbol-preferring [MoneyFormat.format].
+     */
     private fun formatEarnings(earnings: Double, currencyCode: String): String =
-        if (earnings % 1.0 == 0.0) "$currencyCode ${earnings.toInt()}"
-        else "$currencyCode " + String.format(Locale.US, "%.2f", earnings)
+        MoneyFormat.formatWithCode(earnings, currencyCode)
 
     /**
      * @param includeEarnings when false, renders an hours-only ("payment-agnostic")

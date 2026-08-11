@@ -45,6 +45,7 @@ class ReportsFragment : Fragment() {
     private val userRepository = UserRepository()
     private var loadedDays: Map<String, CalendarDayInfo> = emptyMap()
     private var salaryRate: Double = 0.0
+    private var currencyCode: String = com.el.timepay.util.MoneyFormat.DEFAULT_CODE
     private var loadJob: Job? = null
 
     private val keyFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -55,12 +56,9 @@ class ReportsFragment : Fragment() {
     private fun formatHours(hours: Double): String =
         com.el.timepay.util.TimeFormat.hoursToHm(hours)
 
-    /** "PLN 920" / "PLN 920.50", locale-stable. */
-    private fun formatEarnings(earnings: Double): String {
-        val code = getString(R.string.currency_code)
-        return if (earnings % 1.0 == 0.0) "$code ${earnings.toInt()}"
-        else "$code " + String.format(Locale.US, "%.2f", earnings)
-    }
+    /** Earnings in the user's currency ("PLN 920.50"), via the shared formatter. */
+    private fun formatEarnings(earnings: Double): String =
+        com.el.timepay.util.MoneyFormat.format(earnings, currencyCode)
 
     private fun updateMonthText(monthText: android.widget.TextView, month: YearMonth) {
         val context = monthText.context
@@ -111,7 +109,9 @@ class ReportsFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            salaryRate = userRepository.getCurrentUserOnce()?.salaryRate ?: 0.0
+            val user = userRepository.getCurrentUserOnce()
+            salaryRate = user?.salaryRate ?: 0.0
+            currencyCode = user?.currencyCode ?: com.el.timepay.util.MoneyFormat.DEFAULT_CODE
             loadMonth()
         }
     }
@@ -264,6 +264,7 @@ class ReportsFragment : Fragment() {
         val month = currentMonth
         val days = loadedDays
         val rate = salaryRate
+        val code = currencyCode
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
@@ -273,7 +274,7 @@ class ReportsFragment : Fragment() {
                         month,
                         days,
                         rate,
-                        getString(R.string.currency_code),
+                        code,
                         includeEarnings = includeEarnings,
                     )
                 }

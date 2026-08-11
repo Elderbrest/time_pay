@@ -44,6 +44,7 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
     private var existingStatus: String? = null
     private var existingNote: String? = null
     private var salaryRate: Double = 0.0
+    private var currencyCode: String = com.el.timepay.util.MoneyFormat.DEFAULT_CODE
     private var requestKey: String = DEFAULT_REQUEST_KEY
 
     /** Entry point for analytics: Home opens the sheet with planning disabled. */
@@ -90,6 +91,7 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
         existingStatus = args.getString(ARG_STATUS)
         existingNote = args.getString(ARG_NOTE)
         salaryRate = args.getDouble(ARG_RATE)
+        currencyCode = args.getString(ARG_CURRENCY) ?: com.el.timepay.util.MoneyFormat.DEFAULT_CODE
         requestKey = args.getString(ARG_REQUEST_KEY) ?: DEFAULT_REQUEST_KEY
 
         // Resolve initial times: an existing day loads its own saved times; a NEW
@@ -391,12 +393,9 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
     private fun formatHours(hours: Double): String =
         com.el.timepay.util.TimeFormat.hoursToHm(hours)
 
-    /** "PLN 920" / "PLN 920.50", locale-stable. */
-    private fun formatEarnings(earnings: Double): String {
-        val code = getString(R.string.currency_code)
-        return if (earnings % 1.0 == 0.0) "$code ${earnings.toInt()}"
-        else "$code " + String.format(Locale.US, "%.2f", earnings)
-    }
+    /** Earnings in the user's currency ("PLN 920.50"), via the shared formatter. */
+    private fun formatEarnings(earnings: Double): String =
+        com.el.timepay.util.MoneyFormat.format(earnings, currencyCode)
 
     // endregion
 
@@ -426,6 +425,7 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
         private const val ARG_END = "arg_end"
         private const val ARG_NOTE = "arg_note"
         private const val ARG_RATE = "arg_rate"
+        private const val ARG_CURRENCY = "arg_currency"
         private const val ARG_REQUEST_KEY = "arg_request_key"
         private const val ARG_ALLOW_PLAN = "arg_allow_plan"
 
@@ -438,6 +438,7 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
             existingEndTime: String?,
             existingNote: String?,
             salaryRate: Double,
+            currencyCode: String,
             requestKey: String,
             allowPlan: Boolean = true
         ): LogHoursBottomSheet = LogHoursBottomSheet().apply {
@@ -448,6 +449,7 @@ class LogHoursBottomSheet : BottomSheetDialogFragment() {
                 ARG_END to existingEndTime,
                 ARG_NOTE to existingNote,
                 ARG_RATE to salaryRate,
+                ARG_CURRENCY to currencyCode,
                 ARG_REQUEST_KEY to requestKey,
                 ARG_ALLOW_PLAN to allowPlan
             )

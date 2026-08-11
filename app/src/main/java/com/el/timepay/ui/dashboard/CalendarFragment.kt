@@ -40,6 +40,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     private val userRepository = UserRepository()
     private var loadedDays: Map<String, CalendarDayInfo> = emptyMap()
     private var salaryRate: Double = 0.0
+    private var currencyCode: String = com.el.timepay.util.MoneyFormat.DEFAULT_CODE
 
     private val keyFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
@@ -64,12 +65,9 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     private fun formatHours(hours: Double): String =
         com.el.timepay.util.TimeFormat.hoursToHm(hours)
 
-    /** "PLN 920" / "PLN 920.50", locale-stable. */
-    private fun formatEarnings(earnings: Double): String {
-        val code = getString(R.string.currency_code)
-        return if (earnings % 1.0 == 0.0) "$code ${earnings.toInt()}"
-        else "$code " + String.format(Locale.US, "%.2f", earnings)
-    }
+    /** Earnings in the user's currency ("PLN 920.50"), via the shared formatter. */
+    private fun formatEarnings(earnings: Double): String =
+        com.el.timepay.util.MoneyFormat.format(earnings, currencyCode)
 
     private fun dayInfoFor(date: LocalDate?): CalendarDayInfo? =
         date?.let { loadedDays[it.format(keyFormatter)] }
@@ -148,6 +146,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             existingEndTime = info?.endTime,
             existingNote = info?.note,
             salaryRate = salaryRate,
+            currencyCode = currencyCode,
             requestKey = LogHoursBottomSheet.DEFAULT_REQUEST_KEY
         ).show(childFragmentManager, "log_hours")
     }
@@ -283,7 +282,9 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
         // Fetch the salary rate so the month summary + daily earnings can be shown.
         viewLifecycleOwner.lifecycleScope.launch {
-            salaryRate = userRepository.getCurrentUserOnce()?.salaryRate ?: 0.0
+            val user = userRepository.getCurrentUserOnce()
+            salaryRate = user?.salaryRate ?: 0.0
+            currencyCode = user?.currencyCode ?: com.el.timepay.util.MoneyFormat.DEFAULT_CODE
             updateMonthSummary()
             updateDayDetail(selectedDate)
         }

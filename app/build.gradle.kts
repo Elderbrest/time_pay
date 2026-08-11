@@ -67,6 +67,9 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
+    // Explicit: the currency picker's list is the only RecyclerView in the app, and
+    // relying on Material's transitive copy would make it break on a Material bump.
+    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)

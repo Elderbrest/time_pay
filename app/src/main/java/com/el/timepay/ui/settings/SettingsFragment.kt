@@ -18,6 +18,7 @@ import com.el.timepay.databinding.FragmentSettingsBinding
 import com.el.timepay.models.User
 import com.el.timepay.repository.PhotoRepository
 import com.el.timepay.repository.UserRepository
+import com.el.timepay.util.MoneyFormat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +36,13 @@ class SettingsFragment : Fragment() {
 
     /** True once a profile photo has loaded, so initials don't paint over it. */
     private var hasPhoto = false
+
+    /**
+     * The user's currency, held here so the rate prefix and the picker's initial
+     * selection stay in sync between loads. Defaults to PLN for the same reason
+     * [User.currencyCode] does — an existing doc simply has no such field yet.
+     */
+    private var currencyCode: String = MoneyFormat.DEFAULT_CODE
 
     // Android Photo Picker — pick one image with NO storage permission.
     private val imagePickerLauncher = registerForActivityResult(
@@ -55,6 +63,10 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Paint the default immediately so the rate prefix is never blank while the
+        // user doc is still in flight; bindUser overwrites it with the real code.
+        showCurrency(currencyCode)
+
         loadProfileImageForCurrentUser()
         loadUserData()
 
@@ -62,7 +74,69 @@ class SettingsFragment : Fragment() {
         binding.profileImage.setOnClickListener { showPhotoOptions() }
         binding.saveSettingsButton.setOnClickListener { saveUserData() }
         binding.logoutButton.setOnClickListener { showLogoutConfirmationDialog() }
+
+        binding.currencyRow.setOnClickListener {
+            CurrencyPickerBottomSheet.newInstance(currencyCode)
+                .show(childFragmentManager, "currency_picker")
+        }
+
+        // The picker reports the alpha code back; the Firestore write lives here.
+        childFragmentManager.setFragmentResultListener(
+            CurrencyPickerBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            bundle.getString(CurrencyPickerBottomSheet.RESULT_CURRENCY_CODE)
+                ?.let { saveCurrency(it) }
+        }
     }
+
+    /**
+     * Persists the picked currency immediately rather than waiting for "Save changes":
+     * the picker is a one-tap commitment, and leaving the rate prefix showing a code
+     * that isn't stored yet would be a lie. Purely a relabel — no amount is converted.
+     */
+    private fun saveCurrency(code: String) {
+        if (code == currencyCode) return
+
+        val previous = currencyCode
+        currencyCode = code
+        showCurrency(code)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                userRepository.updateUserFields(mapOf("currencyCode" to code))
+                if (_binding == null) return@launch
+                Toast.makeText(
+                    context,
+                    getString(R.string.settings_currency_updated, code),
+                    Toast.LENGTH_SHORT,
+                ).show()
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                android.util.Log.e("SettingsFragment", "Failed to update currency", e)
+                // Roll the UI back so it never claims a currency Firestore didn't take.
+                currencyCode = previous
+                if (_binding != null) {
+                    showCurrency(previous)
+                    Toast.makeText(context, updateFailedMessage(e), Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    /** Paints the currency in both places it appears: the row and the rate prefix. */
+    private fun showCurrency(code: String) {
+        binding.currencyValueText.text = MoneyFormat.symbolFor(code).let { symbol ->
+            if (symbol == code) code else getString(R.string.currency_name_with_symbol, code, symbol)
+        }
+        binding.salaryRateInputLayout.prefixText = MoneyFormat.symbolFor(code)
+    }
+
+    private fun updateFailedMessage(e: Exception): String = getString(
+        R.string.settings_update_failed,
+        e.message ?: getString(R.string.settings_update_failed_unknown),
+    )
 
     private fun loadUserData() {
         setUiLoading(true)
@@ -101,6 +175,9 @@ class SettingsFragment : Fragment() {
             binding.salaryRateInput.setText("")
         }
 
+        currencyCode = user.currencyCode.ifBlank { MoneyFormat.DEFAULT_CODE }
+        showCurrency(currencyCode)
+
         val fullName = "${user.firstName} ${user.lastName}".trim()
         binding.profileNameText.text =
             if (fullName.isNotBlank()) fullName else getString(R.string.settings_default_name)
@@ -115,6 +192,7 @@ class SettingsFragment : Fragment() {
         binding.firstNameInput.isEnabled = !isLoading
         binding.lastNameInput.isEnabled = !isLoading
         binding.salaryRateInput.isEnabled = !isLoading
+        binding.currencyRow.isEnabled = !isLoading
         binding.saveSettingsButton.isEnabled = !isLoading
         binding.saveSettingsButton.text = if (isLoading) {
             getString(R.string.loading_button)
@@ -131,7 +209,7 @@ class SettingsFragment : Fragment() {
         val salaryRate = if (salaryRateText.isNotEmpty()) {
             // Accept a comma decimal (locale keyboards) by normalizing to a dot.
             salaryRateText.replace(',', '.').toDoubleOrNull() ?: run {
-                binding.salaryRateInputLayout.error = "Invalid number"
+                binding.salaryRateInputLayout.error = getString(R.string.settings_rate_invalid)
                 return
             }
         } else {
@@ -159,7 +237,7 @@ class SettingsFragment : Fragment() {
             } catch (e: Exception) {
                 android.util.Log.e("SettingsFragment", "Failed to update settings", e)
                 if (_binding != null) {
-                    Toast.makeText(context, "Failed to update: ${e.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, updateFailedMessage(e), Toast.LENGTH_LONG).show()
                     setUiLoading(false)
                 }
             }
