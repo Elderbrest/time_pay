@@ -72,16 +72,32 @@ class CurrencyPickerBottomSheet : BottomSheetDialogFragment() {
     }
 
     /**
-     * Every currency the platform can render, minus the non-tender codes.
+     * Every currency someone could actually be paid in today. Two filters, because
+     * the platform's raw table is a historical archive, not a list of live money:
      *
-     * `defaultFractionDigits < 0` marks the ISO 4217 "not a real currency" entries —
-     * XXX (no currency), XAU/XAG (precious metals), IMF special drawing rights and
-     * friends. Nobody is paid an hourly rate in gold, so they're only noise here.
-     * Sorted by alpha code, which is also what the search matches against first.
+     * 1. `defaultFractionDigits < 0` drops the ISO 4217 "not a real currency" entries —
+     *    XXX (no currency), XAU/XAG (precious metals), IMF special drawing rights.
+     *    Nobody is paid an hourly rate in gold.
+     * 2. Not backed by any locale drops the *dead* ones. `getAvailableCurrencies()`
+     *    still carries the Deutsche Mark, French Franc, Rhodesian Dollar, and the
+     *    Russian Ruble of 1991–1998; a payroll app listing money from a country that
+     *    no longer exists reads as broken. Cross-referencing against the currencies
+     *    real locales actually use is the reliable test, because plenty of dead
+     *    entries (DEM, FRF, ESP) carry no year marker in their name to grep for.
+     *
+     * [ALWAYS_KEEP] then re-adds the handful of live currencies filter 2 is wrong
+     * about — see there. Net result is ~158 codes instead of the raw 218.
      */
-    private fun buildRows(): List<CurrencyRow> =
-        Currency.getAvailableCurrencies()
+    private fun buildRows(): List<CurrencyRow> {
+        val inUse: Set<Currency> = Locale.getAvailableLocales()
+            .filter { it.country.isNotEmpty() }
+            .mapNotNullTo(mutableSetOf()) {
+                runCatching { Currency.getInstance(it) }.getOrNull()
+            }
+
+        return Currency.getAvailableCurrencies()
             .filter { it.defaultFractionDigits >= 0 }
+            .filter { it in inUse || it.currencyCode in ALWAYS_KEEP }
             .sortedBy { it.currencyCode }
             .map { currency ->
                 val code = currency.currencyCode
@@ -100,6 +116,7 @@ class CurrencyPickerBottomSheet : BottomSheetDialogFragment() {
                     ),
                 )
             }
+    }
 
     /**
      * Case-insensitive filter over both fields, matching how people actually search:
@@ -169,6 +186,24 @@ class CurrencyPickerBottomSheet : BottomSheetDialogFragment() {
         const val RESULT_CURRENCY_CODE = "currency_code"
 
         private const val ARG_SELECTED = "arg_selected"
+
+        /**
+         * Live currencies that the "backed by a locale" test wrongly discards, so the
+         * filter in [buildRows] would drop real money people are paid in:
+         *
+         *  - BGN — Bulgarian lev; loses its locale once Bulgaria maps to the euro.
+         *  - ANG — Netherlands Antillean guilder, still tender on Curaçao/Sint Maarten.
+         *  - AWG — Aruban florin, same shape of gap.
+         *  - VED — Venezuela's redenominated bolívar.
+         *  - XCD/XOF/XAF/XPF — shared regional currencies whose locale coverage is
+         *    patchy across Android versions; each is used by several countries.
+         *
+         * Kept as an explicit list rather than loosening the filter, so re-adding a
+         * currency is a deliberate, reviewable act.
+         */
+        private val ALWAYS_KEEP = setOf(
+            "BGN", "ANG", "AWG", "VED", "XCD", "XOF", "XAF", "XPF",
+        )
 
         fun newInstance(selectedCode: String): CurrencyPickerBottomSheet =
             CurrencyPickerBottomSheet().apply {
