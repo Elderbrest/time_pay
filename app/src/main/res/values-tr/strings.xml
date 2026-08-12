@@ -88,6 +88,8 @@
     <string name="settings_section_profile">Profil</string>
     <string name="settings_section_pay">Ödeme</string>
     <string name="settings_section_account">Hesap</string>
+    <string name="settings_section_app">Uygulama</string>
+    <string name="settings_language">Dil</string>
     <string name="settings_first_name_hint">örn. Elif</string>
     <string name="settings_last_name_hint">örn. Yılmaz</string>
     <string name="settings_rate_hint">0.00</string>
@@ -138,6 +140,9 @@
     <string name="currency_search_empty">Eşleşen para birimi yok</string>
     <string name="currency_name_with_symbol">%1$s (%2$s)</string>
     <string name="currency_selected_mark">✓</string>
+    <string name="language_sheet_title">Dil</string>
+    <string name="language_sheet_app_only">Yalnızca TimePay içindeki dili değiştirir — telefonunuz aynı kalır.</string>
+    <string name="language_system_default">Sistem varsayılanı</string>
     <string name="month_year_format">%1$s %2$d</string>
     <string name="loading_button">Yükleniyor &#8230;</string>
     <string name="save_button">Kaydet</string>

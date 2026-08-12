@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The definitive list of languages TimePay ships (values/ plus every values-xx).
+
+  This file matters even without the in-app picker: on Android 13+ the system builds
+  Settings -> Apps -> TimePay -> Language from it. Without it the app either does not
+  appear in that screen at all, or appears with the wrong set of languages, and
+  AppCompatDelegate.setApplicationLocales() cannot hand the choice to the platform.
+
+  Keep in lockstep with app/src/main/res/values-*/strings.xml — adding a translation
+  folder without adding it here leaves the language invisible to the system.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="es" />
+    <locale android:name="pt" />
+    <locale android:name="fr" />
+    <locale android:name="de" />
+    <locale android:name="it" />
+    <locale android:name="ru" />
+    <locale android:name="pl" />
+    <locale android:name="uk" />
+    <locale android:name="tr" />
+    <locale android:name="id" />
+    <locale android:name="vi" />
+    <locale android:name="uz" />
+</locale-config>

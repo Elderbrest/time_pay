@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -66,6 +68,7 @@ class SettingsFragment : Fragment() {
         // Paint the default immediately so the rate prefix is never blank while the
         // user doc is still in flight; bindUser overwrites it with the real code.
         showCurrency(currencyCode)
+        showLanguage()
 
         loadProfileImageForCurrentUser()
         loadUserData()
@@ -88,7 +91,72 @@ class SettingsFragment : Fragment() {
             bundle.getString(CurrencyPickerBottomSheet.RESULT_CURRENCY_CODE)
                 ?.let { saveCurrency(it) }
         }
+
+        binding.languageRow.setOnClickListener {
+            LanguagePickerBottomSheet.newInstance(currentLanguageTag())
+                .show(childFragmentManager, "language_picker")
+        }
+
+        childFragmentManager.setFragmentResultListener(
+            LanguagePickerBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            bundle.getString(LanguagePickerBottomSheet.RESULT_LANGUAGE_TAG)
+                ?.let { applyLanguage(it) }
+        }
     }
+
+    // region language
+
+    /**
+     * The app locale AppCompat currently holds, as a bare language tag, or "" when the
+     * app is following the phone. Only the language subtag is compared, because
+     * [AppCompatDelegate] may hand back a region-qualified locale (pt-BR, uz-Latn-UZ)
+     * for a picker whose rows are plain languages.
+     */
+    private fun currentLanguageTag(): String {
+        val language = AppCompatDelegate.getApplicationLocales()[0]?.language.orEmpty()
+        return language.takeIf { it in LanguagePickerBottomSheet.SUPPORTED_TAGS }.orEmpty()
+    }
+
+    /** Paints the language row's value: the endonym, or "System default" when unset. */
+    private fun showLanguage() {
+        val tag = currentLanguageTag()
+        binding.languageValueText.text = if (tag.isEmpty()) {
+            getString(R.string.language_system_default)
+        } else {
+            LanguagePickerBottomSheet.endonymOf(tag)
+        }
+    }
+
+    /**
+     * Hands the choice to AppCompat, which persists it itself (in its own store on
+     * API 33+, in SharedPreferences below) and recreates the Activity to re-inflate
+     * every string. Deliberately NOT written to Firestore: the language is a property
+     * of this phone, not of the account, and syncing it would flip the language on a
+     * second device behind the user's back.
+     *
+     * The recreation is safe to trigger from here — the sheet has already dismissed,
+     * and [onDestroyView] nulls the binding, so the coroutines above see `_binding ==
+     * null` and bail instead of touching a dead view. Nav restores its own back stack,
+     * so the user comes back up on Settings rather than Home. Repainting the row is
+     * pointless (this view is about to die) but harmless if the platform decides no
+     * recreation is needed, e.g. re-picking the language already in force.
+     */
+    private fun applyLanguage(tag: String) {
+        if (tag == currentLanguageTag()) return
+
+        AppCompatDelegate.setApplicationLocales(
+            if (tag.isEmpty()) {
+                LocaleListCompat.getEmptyLocaleList()
+            } else {
+                LocaleListCompat.forLanguageTags(tag)
+            }
+        )
+        if (_binding != null) showLanguage()
+    }
+
+    // endregion
 
     /**
      * Persists the picked currency immediately rather than waiting for "Save changes":

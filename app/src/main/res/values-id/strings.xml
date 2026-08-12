@@ -88,6 +88,8 @@
     <string name="settings_section_profile">Profil</string>
     <string name="settings_section_pay">Upah</string>
     <string name="settings_section_account">Akun</string>
+    <string name="settings_section_app">Aplikasi</string>
+    <string name="settings_language">Bahasa</string>
     <string name="settings_first_name_hint">mis. Siti</string>
     <string name="settings_last_name_hint">mis. Rahayu</string>
     <string name="settings_rate_hint">0.00</string>
@@ -138,6 +140,9 @@
     <string name="currency_search_empty">Tidak ada mata uang yang cocok</string>
     <string name="currency_name_with_symbol">%1$s (%2$s)</string>
     <string name="currency_selected_mark">✓</string>
+    <string name="language_sheet_title">Bahasa</string>
+    <string name="language_sheet_app_only">Mengubah bahasa di dalam TimePay saja — ponsel Anda tidak berubah.</string>
+    <string name="language_system_default">Default sistem</string>
     <string name="month_year_format">%1$s %2$d</string>
     <string name="loading_button">Memuat &#8230;</string>
     <string name="save_button">Simpan</string>

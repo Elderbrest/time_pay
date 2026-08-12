@@ -88,6 +88,8 @@
     <string name="settings_section_profile">Profile</string>
     <string name="settings_section_pay">Pay</string>
     <string name="settings_section_account">Account</string>
+    <string name="settings_section_app">App</string>
+    <string name="settings_language">Language</string>
     <string name="settings_first_name_hint">e.g. Marta</string>
     <string name="settings_last_name_hint">e.g. User</string>
     <string name="settings_rate_hint">0.00</string>
@@ -138,6 +140,11 @@
     <string name="currency_search_empty">No currency matches that</string>
     <string name="currency_name_with_symbol">%1$s (%2$s)</string>
     <string name="currency_selected_mark">✓</string>
+    <!-- Language picker. Every row's own label is an endonym computed at runtime, never
+         a resource — only the chrome below is translated. -->
+    <string name="language_sheet_title">Language</string>
+    <string name="language_sheet_app_only">Changes the language inside TimePay only — your phone stays as it is.</string>
+    <string name="language_system_default">System default</string>
     <string name="month_year_format">%1$s %2$d</string>
     <string name="loading_button">Loading &#8230;</string>
     <string name="save_button">Save</string>

@@ -88,6 +88,8 @@
     <string name="settings_section_profile">Profil</string>
     <string name="settings_section_pay">Lohn</string>
     <string name="settings_section_account">Konto</string>
+    <string name="settings_section_app">App</string>
+    <string name="settings_language">Sprache</string>
     <string name="settings_first_name_hint">z. B. Anna</string>
     <string name="settings_last_name_hint">z. B. Schmidt</string>
     <string name="settings_rate_hint">0.00</string>
@@ -138,6 +140,9 @@
     <string name="currency_search_empty">Keine passende Währung</string>
     <string name="currency_name_with_symbol">%1$s (%2$s)</string>
     <string name="currency_selected_mark">✓</string>
+    <string name="language_sheet_title">Sprache</string>
+    <string name="language_sheet_app_only">Ändert die Sprache nur innerhalb von TimePay — dein Telefon bleibt unverändert.</string>
+    <string name="language_system_default">Systemstandard</string>
     <string name="month_year_format">%1$s %2$d</string>
     <string name="loading_button">Wird geladen &#8230;</string>
     <string name="save_button">Speichern</string>
