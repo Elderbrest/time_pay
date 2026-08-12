@@ -39,7 +39,7 @@
     <string name="home_next_shift">Next shift</string>
     <string name="home_shift_chip">Shift</string>
     <string name="home_days_suffix">days</string>
-    <string name="home_hours_logged_separator"> h logged · </string>
+    <string name="home_hours_logged_separator">" h logged · "</string>
     <string name="home_hours_short">%1$s h</string>
     <string name="home_no_planned_days">No planned work days</string>
     <string name="home_default_user">User</string>
