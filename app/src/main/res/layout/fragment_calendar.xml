@@ -309,22 +309,18 @@
                 android:visibility="gone"
                 tools:text="Covered the late shift."
                 tools:visibility="visible" />
+
+            <!-- Contextual action, in-flow so it can never overlap the card content -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/dayActionButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="@dimen/space_16"
+                android:text="@string/calendar_action_log"
+                app:cornerRadius="@dimen/radius_small"
+                app:icon="@drawable/ic_more_time"
+                tools:text="Log hours" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
-    <!-- One contextual action button -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/dayActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/space_4"
-        android:layout_marginBottom="88dp"
-        android:backgroundTint="@color/md_primary"
-        android:text="@string/calendar_action_add"
-        android:textColor="@color/white"
-        app:icon="@drawable/ic_add"
-        app:iconTint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

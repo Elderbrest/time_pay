@@ -18,8 +18,8 @@ import com.el.timepay.models.CalendarDayInfo
 import com.el.timepay.repository.CalendarDayRepository
 import com.el.timepay.repository.UserRepository
 import com.el.timepay.ui.shared.LogHoursBottomSheet
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.view.CalendarView
@@ -45,7 +45,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     private val keyFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     private lateinit var calendarView: CalendarView
-    private lateinit var dayActionButton: ExtendedFloatingActionButton
+    private lateinit var dayActionButton: MaterialButton
 
     private lateinit var monthSummaryHoursText: TextView
     private lateinit var monthSummaryEarningsText: TextView
@@ -102,12 +102,13 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
     }
 
+    /**
+     * Retitles the in-card action for the selected day. Visibility is not touched here:
+     * the button lives inside [dayDetailCard], which `updateDayDetail` shows/hides as a
+     * whole, so a null date already hides the button along with the rest of the card.
+     */
     private fun updateActionButton(date: LocalDate?) {
-        if (date == null) {
-            dayActionButton.visibility = View.GONE
-            return
-        }
-        dayActionButton.visibility = View.VISIBLE
+        if (date == null) return
 
         when (dayInfoFor(date)?.status) {
             "done" -> {
@@ -123,7 +124,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
     }
 
-    /** Primary action for the contextual FAB: opens the shared log/plan sheet. */
+    /** Primary action for the in-card contextual button: opens the shared log/plan sheet. */
     private fun onActionButtonClicked() {
         val date = selectedDate
         if (date == null) {
@@ -392,8 +393,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             currentMonth = it.yearMonth
             updateMonthText(monthTitle, currentMonth)
 
-            // Drop a selection that belongs to a now off-screen month so the FAB and
-            // detail card can't act on a day the user can no longer see.
+            // Drop a selection that belongs to a now off-screen month so the detail card
+            // (and its action button) can't act on a day the user can no longer see.
             if (selectedDate?.let { date -> YearMonth.from(date) != currentMonth } == true) {
                 selectedDate = null
             }
